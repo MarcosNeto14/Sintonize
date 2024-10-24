@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'cadastro.dart';
-import 'recup-senha.dart';
+import 'login.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class RecupSenhaScreen extends StatelessWidget {
+  const RecupSenhaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    final TextEditingController emailController = TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -26,16 +26,19 @@ class LoginScreen extends StatelessWidget {
                     width: 400,
                     height: 400,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 30),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'E-mail',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        'Digite seu e-mail',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
+                      const SizedBox(height: 5),
                       TextFormField(
-                        style: const TextStyle(color: Colors.black),
+                        controller: emailController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -56,38 +59,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Senha',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                      TextFormField(
-                        obscureText: true,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFE1E1C1),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira sua senha';
-                          }
-                          if (value.length < 6) {
-                            return 'A senha deve ter pelo menos 6 caracteres';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   SizedBox(
                     width: 200,
                     height: 50,
@@ -96,7 +68,7 @@ class LoginScreen extends StatelessWidget {
                         if (formKey.currentState!.validate()) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Login realizado com sucesso')),
+                                content: Text('Link de recuperação enviado!')),
                           );
                         }
                       },
@@ -107,7 +79,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Login',
+                        'Recuperar Senha',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -121,25 +93,11 @@ class LoginScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const RecupSenhaScreen()),
+                            builder: (context) => const LoginScreen()),
                       );
                     },
                     child: const Text(
-                      'Esqueci minha senha!',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CadastroScreen()),
-                      );
-                    },
-                    child: const Text(
-                      'Não tem cadastro? Cadastre-se!',
+                      'Voltar para Login',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),

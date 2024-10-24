@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'login.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -155,7 +156,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         validator: _validateDate,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
+                          LengthLimitingTextInputFormatter(8),
                           TextInputFormatter.withFunction((oldValue, newValue) {
                             if (newValue.text.isEmpty) {
                               return TextEditingValue.empty;
@@ -300,12 +301,17 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Já possui cadastro? Faça o login!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Já possui cadastro? Faça o login!',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ],
