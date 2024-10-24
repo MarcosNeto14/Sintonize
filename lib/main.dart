@@ -22,63 +22,62 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Fundo preto
+      backgroundColor: Colors.black, 
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Logo centralizada
             Image.asset(
-              'assets/logo-sintoniza.png', // Certifique-se de adicionar a imagem na pasta assets
-              width: 150, // Ajuste o tamanho da logo conforme necessário
-              height: 150,
+              'assets/logo-sintoniza.png', 
+              width: 400, 
+              height: 400,
             ),
-            const SizedBox(height: 50), // Espaço entre a logo e os botões
+            const SizedBox(height: 50), 
 
             // Botão de Login
             SizedBox(
-              width: 200, // Largura do botão
-              height: 50, // Altura do botão
+              width: 200, 
+              height: 50, 
               child: ElevatedButton(
                 onPressed: () {
-                  // Ação de login
+                  
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, // Cor laranja do botão
+                  backgroundColor: Color(0xFFF14621), 
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+                    borderRadius: BorderRadius.circular(30), 
                   ),
                 ),
                 child: const Text(
                   'Login',
                   style: TextStyle(
-                    color: Colors.white, // Texto branco
+                    color: Colors.white, 
                     fontSize: 18,
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 20), // Espaço entre os botões
+            const SizedBox(height: 20), 
 
             // Botão de Cadastro
             SizedBox(
-              width: 200, // Largura do botão
-              height: 50, // Altura do botão
+              width: 200, 
+              height: 50, 
               child: ElevatedButton(
                 onPressed: () {
-                  // Ação de cadastro
+                  
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, // Cor laranja do botão
+                  backgroundColor: Color(0xFFF14621), 
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+                    borderRadius: BorderRadius.circular(30), 
                   ),
                 ),
                 child: const Text(
                   'Cadastro',
                   style: TextStyle(
-                    color: Colors.white, // Texto branco
+                    color: Colors.white, 
                     fontSize: 18,
                   ),
                 ),
