@@ -34,24 +34,21 @@ class _CadastroScreenState extends State<CadastroScreen> {
       return 'Data inválida. Certifique-se de que todos os campos são números';
     }
 
-    // Verifique se o mês é válido
     if (month < 1 || month > 12) {
       return 'Mês deve ser entre 01 e 12';
     }
 
-    // Verifique se o dia é válido
-    final maxDay = DateTime(year, month + 1, 0).day; // último dia do mês
+    final maxDay = DateTime(year, month + 1, 0).day;
     if (day < 1 || day > maxDay) {
       return 'Dia deve ser entre 01 e $maxDay';
     }
 
-    // Verifique se a data é anterior a hoje
     final date = DateTime(year, month, day);
     if (date.isAfter(DateTime.now())) {
       return 'A data não pode ser no futuro';
     }
 
-    return null; // Data válida
+    return null;
   }
 
   String? _validateEmail(String? value) {
@@ -68,7 +65,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      // Lógica de cadastro
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cadastro realizado com sucesso!')),
       );
@@ -92,8 +88,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   height: 400,
                 ),
                 const SizedBox(height: 50),
-
-                // Campo Nome
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -106,7 +100,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       const SizedBox(height: 5),
                       TextFormField(
                         controller: _nomeController,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -119,23 +114,22 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           if (value == null || value.isEmpty) {
                             return 'O nome é obrigatório';
                           }
-                          // Verifica se o nome contém caracteres especiais ou números
-                          final hasInvalidCharacters = RegExp(r'[^a-zA-ZÀ-ÿ\s]').hasMatch(value);
+                          final hasInvalidCharacters =
+                              RegExp(r'[^a-zA-ZÀ-ÿ\s]').hasMatch(value);
                           if (hasInvalidCharacters) {
                             return 'O nome não pode conter números ou caracteres especiais';
                           }
                           return null;
                         },
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZÀ-ÿ\s]')),
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-ZÀ-ÿ\s]')),
                         ],
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Campo Data de Nascimento
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -148,7 +142,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       const SizedBox(height: 5),
                       TextFormField(
                         controller: _dataNascController,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -160,8 +155,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         validator: _validateDate,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          // Formatação personalizada da data
-                          LengthLimitingTextInputFormatter(10), // Limita a 10 caracteres
+                          LengthLimitingTextInputFormatter(10),
                           TextInputFormatter.withFunction((oldValue, newValue) {
                             if (newValue.text.isEmpty) {
                               return TextEditingValue.empty;
@@ -176,7 +170,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             }
                             return TextEditingValue(
                               text: newText,
-                              selection: TextSelection.collapsed(offset: newText.length),
+                              selection: TextSelection.collapsed(
+                                  offset: newText.length),
                             );
                           }),
                         ],
@@ -185,8 +180,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Campo E-mail
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -199,7 +192,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       const SizedBox(height: 5),
                       TextFormField(
                         controller: _emailController,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -214,8 +208,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Campo Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -229,7 +221,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       TextFormField(
                         controller: _senhaController,
                         obscureText: true,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -249,8 +242,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Campo Confirmação de Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -264,7 +255,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       TextFormField(
                         controller: _confSenhaController,
                         obscureText: true,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -287,8 +279,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // Botão de Cadastro
                 SizedBox(
                   width: 200,
                   height: 50,
@@ -310,8 +300,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Texto de login
                 const Text(
                   'Já possui cadastro? Faça o login!',
                   style: TextStyle(

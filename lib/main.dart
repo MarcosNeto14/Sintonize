@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'cadastro.dart'; // Importando a tela de cadastro
-import 'login.dart';    // Importando a tela de login
+import 'cadastro.dart';
+import 'login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(), // Definindo a tela inicial como HomeScreen
+      home: HomeScreen(),
     );
   }
 }
@@ -35,17 +35,15 @@ class HomeScreen extends StatelessWidget {
               height: 400,
             ),
             const SizedBox(height: 50),
-
-            // Botão de Login
             SizedBox(
               width: 200,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navegar para a tela de login
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -63,19 +61,16 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Botão de Cadastro
             SizedBox(
               width: 200,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navegar para a tela de cadastro
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CadastroScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const CadastroScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

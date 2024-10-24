@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'cadastro.dart'; // Certifique-se de que o caminho está correto
+import 'cadastro.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>(); // Chave para o formulário
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -19,15 +19,13 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const SizedBox(height: 50), // Adiciona espaço acima da logo
+                  const SizedBox(height: 50),
                   Image.asset(
                     'assets/logo-sintoniza.png',
                     width: 400,
                     height: 400,
                   ),
                   const SizedBox(height: 10),
-
-                  // Campo de E-mail
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -49,7 +47,6 @@ class LoginScreen extends StatelessWidget {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu e-mail';
                           }
-                          // Adicionando validação de formato de e-mail
                           if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                             return 'Por favor, insira um e-mail válido';
                           }
@@ -59,8 +56,6 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Campo de Senha
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -83,7 +78,6 @@ class LoginScreen extends StatelessWidget {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira sua senha';
                           }
-                          // Adicionando verificação mínima de comprimento para a senha
                           if (value.length < 6) {
                             return 'A senha deve ter pelo menos 6 caracteres';
                           }
@@ -93,19 +87,16 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Botão de Login
                   SizedBox(
                     width: 200,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          // Se o formulário for válido, navegue para a próxima tela ou faça a lógica de login
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Login realizado com sucesso')),
+                            const SnackBar(
+                                content: Text('Login realizado com sucesso')),
                           );
-                          // Aqui você pode adicionar a lógica para o login
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -123,16 +114,13 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Texto para Cadastro
                   TextButton(
                     onPressed: () {
-                      // Navegar para a tela de cadastro
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const CadastroScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const CadastroScreen()),
                       );
                     },
                     child: const Text(
