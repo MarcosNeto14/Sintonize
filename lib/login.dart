@@ -10,21 +10,22 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView( // Adicione este widget
+      body: SingleChildScrollView(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Form(
-              key: formKey, // Atribuindo a chave ao formulário
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  const SizedBox(height: 50), // Adiciona espaço acima da logo
                   Image.asset(
                     'assets/logo-sintoniza.png',
                     width: 400,
                     height: 400,
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 10),
 
                   // Campo de E-mail
                   Column(
@@ -35,7 +36,7 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       TextFormField(
-                        style: const TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
@@ -69,7 +70,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       TextFormField(
                         obscureText: true,
-                        style: const TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFE1E1C1),
