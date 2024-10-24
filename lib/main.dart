@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'cadastro.dart'; // Importando a tela de cadastro
+import 'login.dart';    // Importando a tela de login
 
 void main() {
   runApp(const MyApp());
@@ -12,13 +13,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: HomeScreen(), // Definindo a tela inicial como HomeScreen
     );
   }
 }
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,11 @@ class LoginScreen extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  // Lógica de login aqui
+                  // Navegar para a tela de login
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF14621),

@@ -163,7 +163,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           // Formatação personalizada da data
                           LengthLimitingTextInputFormatter(10), // Limita a 10 caracteres
                           TextInputFormatter.withFunction((oldValue, newValue) {
-                            if (newValue.text.length == 0) {
+                            if (newValue.text.isEmpty) {
                               return TextEditingValue.empty;
                             }
                             final text = newValue.text.replaceAll('/', '');
