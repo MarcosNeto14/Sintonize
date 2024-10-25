@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'cadastro.dart';
 import 'recup-senha.dart';
+import 'tela-inicial.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -94,9 +95,14 @@ class LoginScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Login realizado com sucesso')),
+                          // Para depuração
+                          print('Login realizado com sucesso');
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaInicialScreen(),
+                            ),
                           );
                         }
                       },
@@ -107,7 +113,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Login',
+                        'Entrar',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -125,7 +131,7 @@ class LoginScreen extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      'Esqueci minha senha!',
+                      'Esqueci minha senha',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
