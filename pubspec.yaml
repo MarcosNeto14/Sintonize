@@ -26,5 +26,7 @@ flutter:
     - assets/logo-sintoniza.png
     - assets/logo-musica.jpg
     - assets/notas-musicais.png
-
-  
+  fonts:
+    - family: Offside
+      fonts:
+        - asset: assets/fonts/Offside-Regular.ttf

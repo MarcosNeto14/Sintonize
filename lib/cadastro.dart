@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login.dart';
+import 'generos-cadastro.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -64,13 +65,17 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cadastro realizado com sucesso!')),
-      );
-    }
+void _submit() {
+  if (_formKey.currentState!.validate()) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const GenerosCadastroScreen(),
+      ),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -306,7 +311,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
+                          builder: (context) => const GenerosCadastroScreen()),
                     );
                   },
                   child: const Text(
