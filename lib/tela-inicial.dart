@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'usuario.dart';
+import 'pesquisa-direta.dart'; // Importa a tela de pesquisa direta
 
 class TelaInicialScreen extends StatelessWidget {
   const TelaInicialScreen({super.key});
@@ -63,12 +64,13 @@ class TelaInicialScreen extends StatelessWidget {
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 30,
+                fontFamily: 'Offside',
               ),
             ),
           ),
           const SizedBox(height: 20),
           Image.asset(
-            'assets/notas-musicais.png',
+            'assets/logo-sintoniza.png',
             width: 200,
             height: 200,
           ),
@@ -97,7 +99,9 @@ class TelaInicialScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Lógica para ir ao artista (pode ser implementada)
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF14621),
                       padding: const EdgeInsets.symmetric(vertical: 15),
@@ -114,7 +118,14 @@ class TelaInicialScreen extends StatelessWidget {
                 const SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PesquisaDiretaScreen(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF14621),
                       padding: const EdgeInsets.symmetric(vertical: 15),
