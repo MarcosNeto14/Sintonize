@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login.dart';
+import 'login.dart';
 import 'generos-cadastro.dart';
 
 class CadastroScreen extends StatefulWidget {
@@ -311,7 +312,7 @@ void _submit() {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const GenerosCadastroScreen()),
+                          builder: (context) => const LoginScreen()),
                     );
                   },
                   child: const Text(

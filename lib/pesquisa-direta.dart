@@ -6,10 +6,9 @@ class PesquisaDiretaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1), // Fundo da tela
+      backgroundColor: const Color(0xFFE1E1C1), 
       body: Column(
         children: [
-          // Barra superior preta com logo
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -26,7 +25,7 @@ class PesquisaDiretaScreen extends StatelessWidget {
           ),
           // Nome da tela centralizado
           const Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: EdgeInsets.only(top: 20),
             child: Text(
               'Pesquisa Direta',
               style: TextStyle(

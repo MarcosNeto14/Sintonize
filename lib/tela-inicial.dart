@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'usuario.dart';
-import 'pesquisa-direta.dart'; // Importa a tela de pesquisa direta
+import 'pesquisa-direta.dart'; 
+import 'pagina-artista.dart';
 
 class TelaInicialScreen extends StatelessWidget {
   const TelaInicialScreen({super.key});
@@ -99,9 +100,13 @@ class TelaInicialScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Lógica para ir ao artista (pode ser implementada)
-                    },
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ArtistaScreen(artistaNome: 'Bruno Mars',)),
+                    );
+                  },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF14621),
                       padding: const EdgeInsets.symmetric(vertical: 15),
