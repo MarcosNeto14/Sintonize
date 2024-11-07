@@ -23,7 +23,6 @@ class PesquisaDiretaScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Nome da tela centralizado
           const Padding(
             padding: EdgeInsets.only(top: 20),
             child: Text(
@@ -37,13 +36,12 @@ class PesquisaDiretaScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // Campo de pesquisa
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.black, // Campo de pesquisa preto
+                fillColor: Colors.black, 
                 hintText: 'Pesquise por artista ou música...',
                 hintStyle: const TextStyle(color: Colors.white),
                 border: OutlineInputBorder(
@@ -56,7 +54,6 @@ class PesquisaDiretaScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // Lista de músicas
           Expanded(
             child: ListView(
               children: [
@@ -75,24 +72,22 @@ class PesquisaDiretaScreen extends StatelessWidget {
   Widget _buildMusicItem(String music, String artist, BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      color: const Color(0xFFE1E1C1), // Fundo do item
+      color: const Color(0xFFE1E1C1), 
       child: ListTile(
         title: Text(
           music,
           style: const TextStyle(
-            fontWeight: FontWeight.bold, // Nome da música em negrito
+            fontWeight: FontWeight.bold, 
           ),
         ),
         subtitle: Text(artist),
         trailing: IconButton(
           icon: const Icon(Icons.arrow_forward, color: Colors.white),
-          color: const Color(0xFFF14621), // Cor do botão
+          color: const Color(0xFFF14621), 
           onPressed: () {
-            // Ação ao pressionar o botão
-            // Adicione aqui a lógica para tocar a música ou redirecionar para a tela de detalhes
           },
         ),
-        tileColor: const Color(0xFFF14621), // Cor do tile
+        tileColor: const Color(0xFFF14621), 
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),

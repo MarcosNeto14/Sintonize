@@ -10,25 +10,23 @@ class UsuarioScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
+          // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             color: Colors.black,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Image.asset(
-                    'assets/logo-sintoniza.png',
-                    width: 80,
-                    height: 80,
-                  ),
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 70,
+                  height: 70,
                 ),
                 const Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(left: 10),
                     child: Text(
-                      'Bem vindo(a), Usuário!',
+                      'Bem-vindo(a), Usuário!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -38,38 +36,22 @@ class UsuarioScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: IconButton(
-                    icon: const Icon(Icons.home, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const TelaInicialScreen()),
-                      );
-                    },
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
+                    );
+                  },
                 ),
               ],
             ),
           ),
+          
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(width: 10),
-              const Text(
-                'Minha Conta',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          
+          // Profile Section
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -79,93 +61,39 @@ class UsuarioScreen extends StatelessWidget {
                 'Nome do Usuário',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Favoritas'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Playlist Pop'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Playlist Rock'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Playlist BR'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Configurações'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Sintonizados'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: _buildPlaylistButton('Sair da conta'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          
+          const SizedBox(height: 30),
+
+          // Playlist Cards Section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView(
+                children: [
+                  _buildPlaylistCard('Favoritas'),
+                  const SizedBox(height: 10),
+                  _buildPlaylistCard('Playlist Pop'),
+                  const SizedBox(height: 10),
+                  _buildPlaylistCard('Playlist Rock'),
+                  const SizedBox(height: 10),
+                  _buildPlaylistCard('Playlist BR'),
+                  
+                  const SizedBox(height: 30),
+
+                  // Other Menu Options as Buttons
+                  _buildMenuButton('Configurações'),
+                  const SizedBox(height: 10),
+                  _buildMenuButton('Sintonizados'),
+                  const SizedBox(height: 10),
+                  _buildMenuButton('Sair da conta', isExitButton: true),
+                ],
+              ),
             ),
           ),
         ],
@@ -173,35 +101,48 @@ class UsuarioScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaylistButton(String title) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFF14621),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+  // Playlist card style
+  Widget _buildPlaylistCard(String title) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: const Color(0xFFF14621),
+      elevation: 4,
+      child: ListTile(
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        trailing: const Icon(Icons.playlist_play, color: Colors.white),
+        onTap: () {
+          // Ação ao clicar no card
+        },
       ),
-      child: Text(title,
-          style: const TextStyle(color: Colors.white, fontSize: 14)),
     );
   }
 
-  Widget _buildMenuButton(String title, BuildContext context,
-      {required double fontSize}) {
+  // Menu button style
+  Widget _buildMenuButton(String title, {bool isExitButton = false}) {
     return ElevatedButton(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFF14621),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        backgroundColor: isExitButton ? Colors.red : const Color(0xFFF14621),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+        elevation: 3,
       ),
       child: Text(
         title,
-        style: TextStyle(color: Colors.white, fontSize: fontSize),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

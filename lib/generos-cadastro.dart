@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tela-inicial.dart'; // Certifique-se de que o caminho está correto
+import 'tela-inicial.dart'; 
 
 class GenerosCadastroScreen extends StatefulWidget {
   const GenerosCadastroScreen({super.key});
@@ -48,16 +48,15 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
               alignment: Alignment.topLeft,
               child: Image.asset(
                 'assets/logo-sintoniza.png',
-                width: 100, // Tamanho da logo
+                width: 100, 
                 height: 100,
               ),
             ),
             const SizedBox(height: 20),
 
-            // Texto atualizado e formatado
             const Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0), // Padding nas laterais
+                padding: EdgeInsets.symmetric(horizontal: 16.0), 
                 child: Text(
                   'SELECIONE OS GÊNEROS MUSICAIS QUE VOCÊ MAIS GOSTA',
                   style: TextStyle(
@@ -66,13 +65,12 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Offside',
                   ),
-                  textAlign: TextAlign.center, // Centraliza o texto
+                  textAlign: TextAlign.center, 
                 ),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Lista de gêneros com botão deslizante
             Expanded(
               child: ListView.builder(
                 itemCount: generos.length,
@@ -88,13 +86,13 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             color: Colors.white,
-                            fontFamily: 'Offside', // Fonte Offside para os gêneros
+                            fontFamily: 'Offside', 
                           ),
                         ),
                         Switch(
                           value: selecionados[genero]!,
                           activeColor: const Color(0xFFF14621),
-                          inactiveThumbColor: const Color.fromARGB(255, 170, 172, 44), // Cor quando desativado
+                          inactiveThumbColor: const Color.fromARGB(255, 170, 172, 44), 
                           onChanged: (bool isSelected) {
                             setState(() {
                               selecionados[genero] = isSelected;
@@ -110,7 +108,6 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
 
             const SizedBox(height: 20),
 
-            // Botão Confirmar
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

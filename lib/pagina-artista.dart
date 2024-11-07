@@ -35,12 +35,11 @@ class ArtistaScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 80), // Para ajustar o espaçamento simétrico
+                const SizedBox(width: 80), 
               ],
             ),
           ),
           const SizedBox(height: 20),
-          // Lista das músicas do artista
           Expanded(
             child: ListView(
               children: [
@@ -60,22 +59,21 @@ class ArtistaScreen extends StatelessWidget {
   Widget _buildMusicItem(String music, BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      color: const Color(0xFFE1E1C1), // Fundo do item
+      color: const Color(0xFFE1E1C1), 
       child: ListTile(
         title: Text(
           music,
           style: const TextStyle(
-            fontWeight: FontWeight.bold, // Nome da música em negrito
+            fontWeight: FontWeight.bold, 
           ),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.arrow_forward, color: Colors.white),
-          color: const Color(0xFFF14621), // Cor do botão
+          color: const Color(0xFFF14621), 
           onPressed: () {
-            // Adicione a lógica ao pressionar o botão, como tocar a música
           },
         ),
-        tileColor: const Color(0xFFF14621), // Cor do tile
+        tileColor: const Color(0xFFF14621), 
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
