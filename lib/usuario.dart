@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
+import 'sintonizados.dart'; // Certifique-se de que esta tela esteja no mesmo diretório ou ajuste o caminho
 
 class UsuarioScreen extends StatelessWidget {
   const UsuarioScreen({super.key});
@@ -41,16 +42,15 @@ class UsuarioScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const TelaInicialScreen()),
                     );
                   },
                 ),
               ],
             ),
           ),
-          
           const SizedBox(height: 20),
-          
           // Profile Section
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -67,9 +67,7 @@ class UsuarioScreen extends StatelessWidget {
               ),
             ],
           ),
-          
           const SizedBox(height: 30),
-
           // Playlist Cards Section
           Expanded(
             child: Padding(
@@ -83,15 +81,25 @@ class UsuarioScreen extends StatelessWidget {
                   _buildPlaylistCard('Playlist Rock'),
                   const SizedBox(height: 10),
                   _buildPlaylistCard('Playlist BR'),
-                  
                   const SizedBox(height: 30),
-
-                  // Other Menu Options as Buttons
-                  _buildMenuButton('Configurações'),
+                  _buildMenuButton(
+                    'Sintonizados',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SintonizadosScreen()),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 10),
-                  _buildMenuButton('Sintonizados'),
-                  const SizedBox(height: 10),
-                  _buildMenuButton('Sair da conta', isExitButton: true),
+                  _buildMenuButton(
+                    'Sair da conta',
+                    isExitButton: true,
+                    onPressed: () {
+                      // Implementar ação de saída
+                    },
+                  ),
                 ],
               ),
             ),
@@ -125,9 +133,10 @@ class UsuarioScreen extends StatelessWidget {
   }
 
   // Menu button style
-  Widget _buildMenuButton(String title, {bool isExitButton = false}) {
+  Widget _buildMenuButton(String title,
+      {bool isExitButton = false, VoidCallback? onPressed}) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: isExitButton ? Colors.red : const Color(0xFFF14621),
         padding: const EdgeInsets.symmetric(vertical: 16),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login.dart';
-import 'login.dart';
 import 'generos-cadastro.dart';
 
 class CadastroScreen extends StatefulWidget {
