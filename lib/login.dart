@@ -45,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (value) {
+                        /*validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu e-mail';
                           }
@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
                             return 'Por favor, insira um e-mail válido';
                           }
                           return null;
-                        },
+                        },*/
                       ),
                     ],
                   ),
@@ -76,7 +76,7 @@ class LoginScreen extends StatelessWidget {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (value) {
+                        /*validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira sua senha';
                           }
@@ -84,7 +84,7 @@ class LoginScreen extends StatelessWidget {
                             return 'A senha deve ter pelo menos 6 caracteres';
                           }
                           return null;
-                        },
+                        },*/
                       ),
                     ],
                   ),
