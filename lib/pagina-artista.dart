@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'tela-inicial.dart';
 
 class ArtistaScreen extends StatelessWidget {
   final String artistaNome; // Nome do artista a ser exibido
@@ -11,7 +12,7 @@ class ArtistaScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFE1E1C1), // Fundo da tela
       body: Column(
         children: [
-          // Barra superior preta com logo e título do artista
+          // Barra superior preta com logo, título do artista e botão "Home"
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -23,19 +24,17 @@ class ArtistaScreen extends StatelessWidget {
                   width: 80,
                   height: 80,
                 ),
-                Expanded(
-                  child: Text(
-                    artistaNome,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Offside',
-                      color: Colors.white,
-                    ),
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.home, color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TelaInicialScreen(),
+                      ),
+                    );
+                  },
                 ),
-                const SizedBox(width: 80), 
               ],
             ),
           ),
@@ -59,21 +58,22 @@ class ArtistaScreen extends StatelessWidget {
   Widget _buildMusicItem(String music, BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      color: const Color(0xFFE1E1C1), 
+      color: const Color(0xFFE1E1C1),
       child: ListTile(
         title: Text(
           music,
           style: const TextStyle(
-            fontWeight: FontWeight.bold, 
+            fontWeight: FontWeight.bold,
           ),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.arrow_forward, color: Colors.white),
-          color: const Color(0xFFF14621), 
+          color: const Color(0xFFF14621),
           onPressed: () {
+            // Ação ao clicar no item de música
           },
         ),
-        tileColor: const Color(0xFFF14621), 
+        tileColor: const Color(0xFFF14621),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),

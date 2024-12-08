@@ -49,7 +49,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
             children: [
               // Barra superior
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
                 color: Colors.black,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -203,7 +204,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const PesquisaDiretaScreen()),
+                                builder: (context) =>
+                                    const PesquisaDiretaScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
