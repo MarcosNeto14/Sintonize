@@ -1,105 +1,175 @@
 import 'package:flutter/material.dart';
+import 'usuario.dart';
+import 'sint-playlist.dart';
 
-class SintonizadosScreen extends StatelessWidget {
+class SintonizadosScreen extends StatefulWidget {
   const SintonizadosScreen({super.key});
 
   @override
+  _SintonizadosScreenState createState() => _SintonizadosScreenState();
+}
+
+class _SintonizadosScreenState extends State<SintonizadosScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  // Lista simulada de postagens
+  final List<Map<String, String>> _posts = [
+    {
+      'nome': 'Marcos',
+      'musica': 'Shallow - Lady Gaga & Bradley Cooper',
+      'localizacao': 'Recife, PE',
+      'imagem': 'assets/logo-sintoniza.png',
+    },
+    {
+      'nome': 'Ana',
+      'musica': 'Blinding Lights - The Weeknd',
+      'localizacao': 'Olinda, PE',
+      'imagem': 'assets/logo-sintoniza.png',
+    },
+    {
+      'nome': 'João',
+      'musica': 'Bohemian Rhapsody - Queen',
+      'localizacao': 'Paulista, PE',
+      'imagem': 'assets/logo-sintoniza.png',
+    },
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    // Lista simulada de postagens
-    final List<Map<String, String>> posts = [
-      {
-        'nome': 'Marcos',
-        'musica': 'Shallow - Lady Gaga & Bradley Cooper',
-        'localizacao': 'Recife, PE',
-        'imagem': 'assets/logo-sintoniza.png',
-      },
-      {
-        'nome': 'Ana',
-        'musica': 'Blinding Lights - The Weeknd',
-        'localizacao': 'Olinda, PE',
-        'imagem': 'assets/logo-sintoniza.png',
-      },
-      {
-        'nome': 'João',
-        'musica': 'Bohemian Rhapsody - Queen',
-        'localizacao': 'Paulista, PE',
-        'imagem': 'assets/logo-sintoniza.png',
-      },
-    ];
+    final filteredPosts = _posts
+        .where((post) =>
+            post['nome']!.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Sintonizados',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              // Ação de busca futura
-            },
-          ),
-        ],
-      ),
       backgroundColor: const Color(0xFFE1E1C1),
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          final post = posts[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+      body: Column(
+        children: [
+          // Cabeçalho com logo e botão "home"
+          Container(
+            color: Colors.black,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 70,
+                  height: 70,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.home, color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const UsuarioScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage(post['imagem']!),
-                    radius: 30,
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          post['nome']!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '🎵 ${post['musica']}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '📍 ${post['localizacao']}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          ),
+          // Barra de busca
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Pesquisar Sintonizados',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
             ),
-          );
-        },
+          ),
+          // Lista de postagens filtradas
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredPosts.length,
+              itemBuilder: (context, index) {
+                final post = filteredPosts[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PlaylistScreen(
+                          nome: post['nome']!,
+                          musica: post['musica']!,
+                          localizacao: post['localizacao']!,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    color: const Color(0xFFF14621), // Fundo do card laranja
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage(post['imagem']!),
+                            radius: 30,
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  post['nome']!,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white, // Texto branco
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  '🎵 ${post['musica']}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  '📍 ${post['localizacao']}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

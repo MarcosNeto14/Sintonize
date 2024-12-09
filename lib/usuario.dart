@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
-import 'sintonizados.dart'; // Certifique-se de que esta tela esteja no mesmo diretório ou ajuste o caminho
+import 'sintonizados.dart';
+import 'main.dart';
 
 class UsuarioScreen extends StatelessWidget {
   const UsuarioScreen({super.key});
@@ -97,7 +98,12 @@ class UsuarioScreen extends StatelessWidget {
                     'Sair da conta',
                     isExitButton: true,
                     onPressed: () {
-                      // Implementar ação de saída
+                      // Redireciona para a tela inicial (HomeScreen)
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      );
                     },
                   ),
                 ],
