@@ -19,7 +19,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(seconds: 3),
     )..repeat();
   }
 
@@ -254,7 +254,7 @@ class DynamicBackgroundPainter extends CustomPainter {
     final waveWidth = size.width / 2;
 
     for (int i = 0; i < 3; i++) {
-      double shift = animationValue * size.width * (i + 1);
+      double shift = animationValue * size.width * 0.5 * (i + 1); 
       Path path = Path();
       path.moveTo(-shift, size.height);
       path.lineTo(-shift, size.height / 2);
