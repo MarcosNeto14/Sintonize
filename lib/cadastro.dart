@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Adicione a importação do Firebase Auth
 import 'login.dart';
 import 'generos-cadastro.dart';
 
@@ -65,17 +66,35 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-void _submit() {
-  if (_formKey.currentState!.validate()) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const GenerosCadastroScreen(),
-      ),
-    );
-  }
-}
+  void _submit() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Cadastro no Firebase
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _senhaController.text,
+        );
 
+        // Navegação para a próxima tela após o cadastro bem-sucedido
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const GenerosCadastroScreen(),
+          ),
+        );
+      } on FirebaseAuthException catch (e) {
+        // Exibe mensagem de erro caso ocorra um erro durante o cadastro
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao cadastrar: ${e.message}")),
+        );
+      } catch (e) {
+        // Para outros erros não relacionados ao Firebase
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro desconhecido: $e")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,10 +317,7 @@ void _submit() {
                     ),
                     child: const Text(
                       'Cadastrar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
@@ -310,13 +326,12 @@ void _submit() {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
                     );
                   },
                   child: const Text(
-                    'Já possui cadastro? Faça o login!',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    'Já tem uma conta? Faça login',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],

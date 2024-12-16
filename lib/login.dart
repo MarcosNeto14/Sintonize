@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import necessário
 import 'cadastro.dart';
 import 'recup-senha.dart';
 import 'tela-inicial.dart';
@@ -9,6 +10,48 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final senhaController = TextEditingController();
+
+    Future<void> _login(BuildContext context) async {
+      if (!formKey.currentState!.validate()) {
+        return;
+      }
+
+      final email = emailController.text.trim();
+      final senha = senhaController.text.trim();
+
+      try {
+        // Tentativa de login no Firebase
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: senha);
+
+        // Navegar para a tela inicial após o login bem-sucedido
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        String errorMessage;
+
+        // Tratamento de erros
+        if (e.code == 'user-not-found') {
+          errorMessage = 'Usuário não encontrado.';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Senha incorreta.';
+        } else {
+          errorMessage = 'Erro ao fazer login: ${e.message}';
+        }
+
+        // Exibição da mensagem de erro
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -36,6 +79,7 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       TextFormField(
+                        controller: emailController,
                         style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           filled: true,
@@ -45,7 +89,7 @@ class LoginScreen extends StatelessWidget {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        /*validator: (value) {
+                        validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu e-mail';
                           }
@@ -53,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                             return 'Por favor, insira um e-mail válido';
                           }
                           return null;
-                        },*/
+                        },
                       ),
                     ],
                   ),
@@ -66,6 +110,7 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       TextFormField(
+                        controller: senhaController,
                         obscureText: true,
                         style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
@@ -76,7 +121,7 @@ class LoginScreen extends StatelessWidget {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        /*validator: (value) {
+                        validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira sua senha';
                           }
@@ -84,7 +129,7 @@ class LoginScreen extends StatelessWidget {
                             return 'A senha deve ter pelo menos 6 caracteres';
                           }
                           return null;
-                        },*/
+                        },
                       ),
                     ],
                   ),
@@ -93,19 +138,7 @@ class LoginScreen extends StatelessWidget {
                     width: 200,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          // Para depuração
-                          print('Login realizado com sucesso');
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TelaInicialScreen(),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: () => _login(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF14621),
                         shape: RoundedRectangleBorder(

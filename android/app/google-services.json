@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "16383734437",
+    "project_id": "sintonize-fa494",
+    "storage_bucket": "sintonize-fa494.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16383734437:android:52c9b5066109ae947b934c",
+        "android_client_info": {
+          "package_name": "com.example.sintonize"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOCqDSppaWZda43qoAdSS70Z79K66TcWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
