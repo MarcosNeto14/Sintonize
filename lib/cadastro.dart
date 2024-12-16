@@ -69,13 +69,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Cadastro no Firebase
+
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _senhaController.text,
         );
 
-        // Navegação para a próxima tela após o cadastro bem-sucedido
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -83,12 +83,12 @@ class _CadastroScreenState extends State<CadastroScreen> {
           ),
         );
       } on FirebaseAuthException catch (e) {
-        // Exibe mensagem de erro caso ocorra um erro durante o cadastro
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro ao cadastrar: ${e.message}")),
         );
       } catch (e) {
-        // Para outros erros não relacionados ao Firebase
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro desconhecido: $e")),
         );
