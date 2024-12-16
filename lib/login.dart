@@ -22,35 +22,38 @@ class LoginScreen extends StatelessWidget {
       final senha = senhaController.text.trim();
 
       try {
-        // Tentativa de login no Firebase
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: senha);
+  // Tentativa de login no Firebase
+  await FirebaseAuth.instance
+      .signInWithEmailAndPassword(email: email, password: senha);
 
-        // Navegar para a tela inicial após o login bem-sucedido
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
-        );
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
+  // Navegar para a tela inicial após o login bem-sucedido
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
+  );
+} on FirebaseAuthException catch (e) {
+  String errorMessage;
 
-        // Tratamento de erros
-        if (e.code == 'user-not-found') {
-          errorMessage = 'Usuário não encontrado.';
-        } else if (e.code == 'wrong-password') {
-          errorMessage = 'Senha incorreta.';
-        } else {
-          errorMessage = 'Erro ao fazer login: ${e.message}';
-        }
+  // Tratamento de erros específicos
+  if (e.code == 'user-not-found') {
+    errorMessage = 'Usuário não encontrado. Verifique o e-mail e tente novamente.';
+  } else if (e.code == 'wrong-password') {
+    errorMessage = 'Senha incorreta. Certifique-se de que está digitando a senha corretamente.';
+  } else if (e.code == 'invalid-credential') {
+    errorMessage = 'As credenciais fornecidas são inválidas. Tente novamente.';
+  } else {
+    errorMessage = 'Erro inesperado ao fazer login. Por favor, tente novamente mais tarde.';
+  }
 
-        // Exibição da mensagem de erro
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+  // Exibição da mensagem de erro
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(errorMessage),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
+
     }
 
     return Scaffold(

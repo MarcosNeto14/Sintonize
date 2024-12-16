@@ -317,7 +317,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     ),
                     child: const Text(
                       'Cadastrar',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
