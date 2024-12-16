@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
 import 'sintonizados.dart';
 import 'main.dart';
+import 'excluir-conta.dart';
+import 'alterar-dados.dart';
 
 class UsuarioScreen extends StatelessWidget {
   const UsuarioScreen({super.key});
@@ -12,7 +14,6 @@ class UsuarioScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
-          // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             color: Colors.black,
@@ -52,7 +53,6 @@ class UsuarioScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // Profile Section
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -66,10 +66,20 @@ class UsuarioScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const SizedBox(width: 10),
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.black),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AlterarDadosScreen()),
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(height: 30),
-          // Playlist Cards Section
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -93,16 +103,25 @@ class UsuarioScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   _buildMenuButton(
                     'Sair da conta',
-                    isExitButton: true,
                     onPressed: () {
-                      // Redireciona para a tela inicial (HomeScreen)
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const HomeScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  _buildMenuButton(
+                    'Excluir conta',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ExcluirContaScreen()),
                       );
                     },
                   ),
@@ -115,7 +134,6 @@ class UsuarioScreen extends StatelessWidget {
     );
   }
 
-  // Playlist card style
   Widget _buildPlaylistCard(String title) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -131,14 +149,11 @@ class UsuarioScreen extends StatelessWidget {
           ),
         ),
         trailing: const Icon(Icons.playlist_play, color: Colors.white),
-        onTap: () {
-          // Ação ao clicar no card
-        },
+        onTap: () {},
       ),
     );
   }
 
-  // Menu button style
   Widget _buildMenuButton(String title,
       {bool isExitButton = false, VoidCallback? onPressed}) {
     return ElevatedButton(

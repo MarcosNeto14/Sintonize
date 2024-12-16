@@ -34,20 +34,17 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Fundo dinâmico animado
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
               return CustomPaint(
                 painter: DynamicBackgroundPainter(_controller.value),
-                child: SizedBox.expand(), // Preenche toda a tela
+                child: SizedBox.expand(),
               );
             },
           ),
-          // Conteúdo da tela
           Column(
             children: [
-              // Barra superior
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
@@ -86,7 +83,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              // Texto principal como card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Card(
@@ -103,8 +99,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                       borderRadius: BorderRadius.circular(20),
                       gradient: const LinearGradient(
                         colors: [
-                          Color(0xFFFF9E80), // Gradiente inicial
-                          Color(0xFFF14621), // Gradiente final
+                          Color(0xFFFF9E80),
+                          Color(0xFFF14621),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -136,14 +132,12 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              // Imagem dinâmica
               Image.asset(
                 'assets/logo-sintoniza.png',
                 width: 180,
                 height: 180,
               ),
               const SizedBox(height: 20),
-              // Informações da música
               const Text(
                 'Die With a Smile',
                 style: TextStyle(
@@ -163,7 +157,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 ),
               ),
               const Spacer(),
-              // Botões
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -238,7 +231,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
   }
 }
 
-// Fundo dinâmico
 class DynamicBackgroundPainter extends CustomPainter {
   final double animationValue;
 
@@ -254,7 +246,7 @@ class DynamicBackgroundPainter extends CustomPainter {
     final waveWidth = size.width / 2;
 
     for (int i = 0; i < 3; i++) {
-      double shift = animationValue * size.width * 0.5 * (i + 1); 
+      double shift = animationValue * size.width * 0.5 * (i + 1);
       Path path = Path();
       path.moveTo(-shift, size.height);
       path.lineTo(-shift, size.height / 2);

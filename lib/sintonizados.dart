@@ -13,7 +13,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Lista simulada de postagens
   final List<Map<String, String>> _posts = [
     {
       'nome': 'Marcos',
@@ -46,7 +45,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
-          // Cabeçalho com logo e botão "home"
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -72,7 +70,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
               ],
             ),
           ),
-          // Barra de busca
           Padding(
             padding: const EdgeInsets.all(10),
             child: TextField(
@@ -91,7 +88,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
               ),
             ),
           ),
-          // Lista de postagens filtradas
           Expanded(
             child: ListView.builder(
               itemCount: filteredPosts.length,
@@ -116,7 +112,7 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    color: const Color(0xFFF14621), // Fundo do card laranja
+                    color: const Color(0xFFF14621),
                     elevation: 4,
                     child: Padding(
                       padding: const EdgeInsets.all(15),
@@ -137,7 +133,7 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white, // Texto branco
+                                    color: Colors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 5),
