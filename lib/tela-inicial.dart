@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'usuario.dart';
 import 'pesquisa-direta.dart';
 import 'pagina-artista.dart';
@@ -29,6 +31,22 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     super.dispose();
   }
 
+  Future<String> fetchUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get();
+
+      if (docSnapshot.exists) {
+        return docSnapshot.data()?['nome'] ?? 'Usuário';
+      }
+    }
+    return 'Usuário';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,16 +75,48 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                       width: 80,
                       height: 80,
                     ),
-                    const Expanded(
-                      child: Text(
-                        'Bem vindo(a), Usuário!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Poppins',
-                        ),
+                    Expanded(
+                      child: FutureBuilder<String>(
+                        future: fetchUserName(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Text(
+                              'Carregando...',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins',
+                              ),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return const Text(
+                              'Erro ao carregar',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins',
+                              ),
+                            );
+                          }
+
+                          return Text(
+                            'Bem vindo(a), ${snapshot.data}!',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Poppins',
+                            ),
+                          );
+                        },
                       ),
                     ),
                     IconButton(

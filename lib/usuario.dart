@@ -1,21 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tela-inicial.dart';
 import 'sintonizados.dart';
 import 'main.dart';
 import 'excluir-conta.dart';
 import 'alterar-dados.dart';
 
-class UsuarioScreen extends StatelessWidget {
+class UsuarioScreen extends StatefulWidget {
   const UsuarioScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final User? user =
-        FirebaseAuth.instance.currentUser; // Obtém o usuário autenticado
-    final String userName = user?.displayName ??
-        'Usuário'; // Exibe o nome, ou 'Usuário' se não estiver definido
+  State<UsuarioScreen> createState() => _UsuarioScreenState();
+}
 
+class _UsuarioScreenState extends State<UsuarioScreen> {
+  String userName = 'Carregando...';
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    if (user != null) {
+      try {
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(user!.uid)
+            .get();
+
+        setState(() {
+          userName = userDoc['nome'] ?? 'Usuário';
+        });
+      } catch (e) {
+        setState(() {
+          userName = 'Erro ao carregar';
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
@@ -31,13 +60,13 @@ class UsuarioScreen extends StatelessWidget {
                   width: 70,
                   height: 70,
                 ),
-                const Expanded(
+                Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 10),
+                    padding: const EdgeInsets.only(left: 10),
                     child: Text(
-                      'Bem-vindo(a), Usuário!',
+                      'Bem-vindo(a), $userName!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -65,7 +94,7 @@ class UsuarioScreen extends StatelessWidget {
               const Icon(Icons.person, color: Colors.black, size: 60),
               const SizedBox(width: 10),
               Text(
-                userName, // Exibe o nome do usuário
+                userName,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 24,

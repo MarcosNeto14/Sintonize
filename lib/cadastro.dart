@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Adicione a importação do Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'login.dart';
 import 'generos-cadastro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +27,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   String? _estadoSelecionado;
 
-  // Lista de siglas dos estados brasileiros
   final List<String> _estados = [
     "AC",
     "AL",
@@ -128,17 +127,14 @@ class _CadastroScreenState extends State<CadastroScreen> {
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Criação de usuário no Firebase Auth
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _senhaController.text,
         );
 
-        // Obtenha o UID do usuário recém-criado
         String uid = userCredential.user!.uid;
 
-        // Adicionar dados do usuário no Firestore
         await FirebaseFirestore.instance.collection('usuarios').doc(uid).set({
           'nome': _nomeController.text,
           'data_nasc': _dataNascController.text,
@@ -231,7 +227,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Data de Nascimento
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -282,7 +277,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // E-mail
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -311,7 +305,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -340,7 +333,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Confirmar Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -375,7 +367,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Endereço
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -406,7 +397,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Número
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -438,7 +428,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Bairro
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -469,7 +458,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Cidade
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -500,7 +488,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Estado
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -539,7 +526,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // CEP
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
