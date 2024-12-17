@@ -18,6 +18,44 @@ class _CadastroScreenState extends State<CadastroScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confSenhaController = TextEditingController();
+  final TextEditingController _ruaController = TextEditingController();
+  final TextEditingController _numeroController = TextEditingController();
+  final TextEditingController _bairroController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
+
+  String? _estadoSelecionado;
+
+  // Lista de siglas dos estados brasileiros
+  final List<String> _estados = [
+    "AC",
+    "AL",
+    "AP",
+    "AM",
+    "BA",
+    "CE",
+    "DF",
+    "ES",
+    "GO",
+    "MA",
+    "MT",
+    "MS",
+    "MG",
+    "PA",
+    "PB",
+    "PR",
+    "PE",
+    "PI",
+    "RJ",
+    "RN",
+    "RS",
+    "RO",
+    "RR",
+    "SC",
+    "SP",
+    "SE",
+    "TO"
+  ];
 
   String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
@@ -66,16 +104,36 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
+  String? _validateCEP(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'O CEP é obrigatório';
+    }
+    if (value.length != 9 || !RegExp(r'^\d{5}-\d{3}$').hasMatch(value)) {
+      return 'CEP inválido. Formato correto: XXXXX-XXX';
+    }
+    return null;
+  }
+
+  String? _validateNumero(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'O número é obrigatório';
+    }
+    if (int.tryParse(value) == null) {
+      return 'O número deve ser numérico';
+    }
+    return null;
+  }
+
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
-
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _senhaController.text,
         );
 
-
+        // Navegar para a próxima tela (exemplo)
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -83,12 +141,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
           ),
         );
       } on FirebaseAuthException catch (e) {
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro ao cadastrar: ${e.message}")),
         );
       } catch (e) {
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro desconhecido: $e")),
         );
@@ -113,6 +169,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   height: 400,
                 ),
                 const SizedBox(height: 50),
+                // Nome
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -155,6 +212,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Data de Nascimento
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -205,6 +263,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // E-mail
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -233,6 +292,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -256,24 +316,19 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'A senha é obrigatória';
-                          }
-                          return null;
-                        },
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Confirmar Senha
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Confirme sua Senha',
+                        'Confirmar Senha',
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                       const SizedBox(height: 5),
@@ -291,14 +346,207 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'A confirmação da senha é obrigatória';
-                          }
                           if (value != _senhaController.text) {
-                            return 'As senhas não correspondem';
+                            return 'As senhas não coincidem';
                           }
                           return null;
                         },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Endereço
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Rua',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: _ruaController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: 'Rua',
+                          hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 102, 102, 102)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Número
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Número',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: _numeroController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: 'Número',
+                          hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 102, 102, 102)),
+                        ),
+                        validator: _validateNumero,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Bairro
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Bairro',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: _bairroController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: 'Bairro',
+                          hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 102, 102, 102)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Cidade
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Cidade',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: _cidadeController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: 'Cidade',
+                          hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 102, 102, 102)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Estado
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Estado',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      DropdownButtonFormField<String>(
+                        value: _estadoSelecionado,
+                        items: _estados
+                            .map(
+                              (estado) => DropdownMenuItem<String>(
+                                value: estado,
+                                child: Text(estado),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _estadoSelecionado = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // CEP
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'CEP',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: _cepController,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFE1E1C1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: 'CEP',
+                          hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 102, 102, 102)),
+                        ),
+                        validator: _validateCEP,
                       ),
                     ],
                   ),
@@ -326,7 +574,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
                     );
                   },
                   child: const Text(

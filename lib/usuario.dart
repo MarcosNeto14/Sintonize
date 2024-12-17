@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'tela-inicial.dart';
 import 'sintonizados.dart';
 import 'main.dart';
@@ -10,6 +11,11 @@ class UsuarioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User? user =
+        FirebaseAuth.instance.currentUser; // Obtém o usuário autenticado
+    final String userName = user?.displayName ??
+        'Usuário'; // Exibe o nome, ou 'Usuário' se não estiver definido
+
     return Scaffold(
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
@@ -58,9 +64,9 @@ class UsuarioScreen extends StatelessWidget {
             children: [
               const Icon(Icons.person, color: Colors.black, size: 60),
               const SizedBox(width: 10),
-              const Text(
-                'Nome do Usuário',
-                style: TextStyle(
+              Text(
+                userName, // Exibe o nome do usuário
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

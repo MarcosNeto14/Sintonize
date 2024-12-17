@@ -1,9 +1,75 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'usuario.dart';
-import 'main.dart';
+import 'main.dart'; // Sua tela inicial
+import 'usuario.dart'; // Tela do usuário
 
-class ExcluirContaScreen extends StatelessWidget {
+class ExcluirContaScreen extends StatefulWidget {
   const ExcluirContaScreen({super.key});
+
+  @override
+  _ExcluirContaScreenState createState() => _ExcluirContaScreenState();
+}
+
+class _ExcluirContaScreenState extends State<ExcluirContaScreen> {
+  final TextEditingController _senhaController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _excluirConta() async {
+    try {
+      // Recupera o usuário atual
+      User? user = _auth.currentUser;
+
+      if (user == null) {
+        _mostrarMensagem("Nenhum usuário logado.");
+        return;
+      }
+
+      String senha = _senhaController.text;
+
+      // Verifique se a senha está correta
+      // O Firebase Auth não permite verificar diretamente a senha, então vamos reautenticar o usuário
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: senha,
+      );
+
+      try {
+        // Reautentica o usuário com a senha fornecida
+        await user.reauthenticateWithCredential(credential);
+
+        // Se a senha estiver correta, exclui a conta
+        await user.delete();
+
+        _mostrarMensagem(
+            'Conta excluída com sucesso, retornando para a tela inicial');
+
+        Future.delayed(const Duration(seconds: 3), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        });
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'wrong-password') {
+          _mostrarMensagem("Senha incorreta.");
+        } else {
+          _mostrarMensagem("Erro ao excluir a conta: ${e.message}");
+        }
+      }
+    } catch (e) {
+      _mostrarMensagem("Erro inesperado: $e");
+    }
+  }
+
+  // Função para exibir uma mensagem de SnackBar
+  void _mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +131,7 @@ class ExcluirContaScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
+              controller: _senhaController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Senha',
@@ -85,23 +152,7 @@ class ExcluirContaScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Conta excluída com sucesso, retornando para a tela inicial'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-
-                    Future.delayed(const Duration(seconds: 3), () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
-                      );
-                    });
-                  },
+                  onPressed: _excluirConta,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(
