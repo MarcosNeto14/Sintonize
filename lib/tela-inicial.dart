@@ -21,7 +21,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 8),
     )..repeat();
   }
 
@@ -228,7 +228,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          shadowColor: Colors.black.withOpacity(0.3),
+                          shadowColor: Colors.black.withOpacity(0.9),
                           elevation: 5,
                         ),
                         child: const Text(
@@ -292,7 +292,7 @@ class DynamicBackgroundPainter extends CustomPainter {
       ..color = const Color(0xFFF14621).withOpacity(0.3)
       ..style = PaintingStyle.fill;
 
-    final waveHeight = 100;
+    final waveHeight = 50;
     final waveWidth = size.width / 2;
 
     for (int i = 0; i < 3; i++) {

@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
     final emailController = TextEditingController();
     final senhaController = TextEditingController();
 
-    Future<void> _login(BuildContext context) async {
+    Future<void> login(BuildContext context) async {
       if (!formKey.currentState!.validate()) {
         return;
       }
@@ -141,7 +141,7 @@ class LoginScreen extends StatelessWidget {
                     width: 200,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () => _login(context),
+                      onPressed: () => login(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF14621),
                         shape: RoundedRectangleBorder(
