@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Adicione a importação do Firebase Auth
 import 'login.dart';
 import 'generos-cadastro.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -127,13 +128,31 @@ class _CadastroScreenState extends State<CadastroScreen> {
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
+        // Criação de usuário no Firebase Auth
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _senhaController.text,
         );
 
-        // Navegar para a próxima tela (exemplo)
+        // Obtenha o UID do usuário recém-criado
+        String uid = userCredential.user!.uid;
+
+        // Adicionar dados do usuário no Firestore
+        await FirebaseFirestore.instance.collection('usuarios').doc(uid).set({
+          'nome': _nomeController.text,
+          'data_nasc': _dataNascController.text,
+          'email': _emailController.text,
+          'endereco': {
+            'rua': _ruaController.text,
+            'numero': _numeroController.text,
+            'bairro': _bairroController.text,
+            'cidade': _cidadeController.text,
+            'estado': _estadoSelecionado,
+            'cep': _cepController.text,
+          },
+        });
+
         Navigator.push(
           context,
           MaterialPageRoute(
