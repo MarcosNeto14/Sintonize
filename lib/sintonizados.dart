@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'usuario.dart';
 import 'sint-playlist.dart';
+import 'barra_de_pesquisa.dart';
 
 class SintonizadosScreen extends StatefulWidget {
   const SintonizadosScreen({super.key});
@@ -70,23 +71,14 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Pesquisar Sintonizados',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ),
+          BarraDePesquisa(
+            controller: _searchController,
+            hintText: 'Pesquisar Sintonizados',
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
           ),
           Expanded(
             child: ListView.builder(

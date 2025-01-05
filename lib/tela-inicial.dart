@@ -52,6 +52,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return Scaffold(
       body: Stack(
         children: [
+          // Background com animação
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -61,77 +62,9 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
               );
             },
           ),
+          // Conteúdo da tela
           Column(
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-                color: Colors.black,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset(
-                      'assets/logo-sintoniza.png',
-                      width: 80,
-                      height: 80,
-                    ),
-                    Expanded(
-                      child: FutureBuilder<String>(
-                        future: fetchUserName(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Text(
-                              'Carregando...',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Poppins',
-                              ),
-                            );
-                          }
-
-                          if (snapshot.hasError) {
-                            return const Text(
-                              'Erro ao carregar',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Poppins',
-                              ),
-                            );
-                          }
-
-                          return Text(
-                            'Bem vindo(a), ${snapshot.data}!',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Poppins',
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.person, color: Colors.white),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const UsuarioScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -161,19 +94,50 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                         const Icon(
                           Icons.music_note,
                           color: Colors.white,
-                          size: 30,
+                          size: 50,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                            'ESSA MÚSICA É A SUA CARA! QUE TAL SINTONIZAR?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: FutureBuilder<String>(
+                            future: fetchUserName(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Text(
+                                  'Carregando...',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasError) {
+                                return const Text(
+                                  'Erro ao carregar',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }
+
+                              return Text(
+                                '${snapshot.data?.toUpperCase()}, ESSA MÚSICA É A SUA CARA, QUE TAL SINTONIZAR?',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -274,6 +238,21 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
               ),
               const SizedBox(height: 50),
             ],
+          ),
+          Positioned(
+            top: 30,
+            right: 30,
+            child: IconButton(
+              icon: const Icon(Icons.person, color: Colors.white, size: 60),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UsuarioScreen(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
