@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'usuario.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AlterarDadosScreen extends StatefulWidget {
   const AlterarDadosScreen({super.key});
@@ -16,21 +18,79 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _senhaAtualController = TextEditingController();
 
-  void _submit() {
-    if (_senhaAtualController.text.isEmpty) {
+  void _submit() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, preencha sua senha atual.'),
-        ),
+        const SnackBar(content: Text('Usuário não autenticado.')),
       );
       return;
     }
 
-    if (_formKey.currentState!.validate()) {
+    if (_senhaAtualController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, preencha sua senha atual.')),
+      );
+      return;
+    }
+
+    try {
+      // Reautenticar o usuário para verificar a senha atual
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: _senhaAtualController.text,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // Atualizar os dados do Firebase
+      final updates = <String, dynamic>{};
+      if (_nomeController.text.isNotEmpty) {
+        updates['nome'] = _nomeController.text;
+      }
+      if (_dataNascController.text.isNotEmpty) {
+        updates['data_nasc'] = _dataNascController.text;
+      }
+      if (_emailController.text.isNotEmpty) {
+        await user.updateEmail(_emailController.text);
+        updates['email'] = _emailController.text;
+      }
+      if (_senhaController.text.isNotEmpty) {
+        await user.updatePassword(_senhaController.text);
+      }
+
+      if (updates.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(user.uid)
+            .update(updates);
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dados atualizados com sucesso!')),
       );
       Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'wrong-password':
+          message = 'Senha atual incorreta.';
+          break;
+        case 'email-already-in-use':
+          message = 'O e-mail informado já está em uso.';
+          break;
+        case 'weak-password':
+          message = 'A nova senha é muito fraca.';
+          break;
+        default:
+          message = 'Erro ao atualizar dados.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro inesperado.')),
+      );
     }
   }
 
