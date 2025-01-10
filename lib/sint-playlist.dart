@@ -19,7 +19,6 @@ class PlaylistScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
-          // Cabeçalho com logo e botão "home"
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -45,7 +44,6 @@ class PlaylistScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Título "Playlists de {nome}"
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -58,11 +56,9 @@ class PlaylistScreen extends StatelessWidget {
             ),
           ),
           const Divider(thickness: 1),
-          // Corpo da página
           Expanded(
             child: Column(
               children: [
-                // Informações do usuário
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -97,7 +93,6 @@ class PlaylistScreen extends StatelessWidget {
                 ),
                 const Divider(thickness: 1),
                 const SizedBox(height: 10),
-                // Título "Playlists"
                 const Text(
                   'Playlists',
                   style: TextStyle(
@@ -140,9 +135,7 @@ class PlaylistScreen extends StatelessWidget {
           ),
         ),
         leading: const Icon(Icons.music_note, color: Colors.white),
-        onTap: () {
-          // Implementar ação ao clicar na playlist
-        },
+        onTap: () {},
       ),
     );
   }

@@ -52,7 +52,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Background com animação
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -62,7 +61,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
               );
             },
           ),
-          // Conteúdo da tela
           Column(
             children: [
               const SizedBox(height: 20),
@@ -101,7 +99,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                           child: FutureBuilder<String>(
                             future: fetchUserName(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return const Text(
                                   'Carregando...',
                                   textAlign: TextAlign.center,
@@ -146,30 +145,57 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              Image.asset(
-                'assets/logo-sintoniza.png',
-                width: 180,
-                height: 180,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Die With a Smile',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 24,
-                  fontFamily: 'Piazzolla',
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('musica')
+                      .limit(1) // Limita para pegar apenas uma música
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      // Adicionando uma mensagem de erro mais clara
+                      return Center(
+                        child:
+                            Text('Erro ao carregar músicas: ${snapshot.error}'),
+                      );
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text('Nenhuma música encontrada'),
+                      );
+                    }
+
+                    final musicas = snapshot.data!.docs;
+
+                    // Pegando a primeira música
+                    final musica = musicas[0].data() as Map<String, dynamic>;
+
+                    final nome = musica['nome'] ?? 'Sem título';
+                    final artista = musica['artista'] ?? 'Desconhecido';
+
+                    return Center(
+                      // Mostrando a música no centro
+                      child: ListTile(
+                        title: Text(
+                          nome,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(artista),
+                        leading: const Icon(Icons.music_note),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 5),
-              const Text(
-                'Lady Gaga feat. Bruno Mars',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18,
-                  fontFamily: 'Piazzolla',
-                ),
-              ),
+              const SizedBox(height: 50),
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

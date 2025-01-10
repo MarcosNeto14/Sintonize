@@ -27,19 +27,38 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
   Future<void> _fetchUserName() async {
     if (user != null) {
       try {
-        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('usuarios')
-            .doc(user!.uid)
-            .get();
+        final DocumentSnapshot<Map<String, dynamic>> userDoc =
+            await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(user!.uid)
+                .get();
 
-        setState(() {
-          userName = userDoc['nome'] ?? 'Usuário';
-        });
+        if (userDoc.exists) {
+          final userData = userDoc.data();
+          if (userData != null && userData.containsKey('nome')) {
+            setState(() {
+              userName = userData['nome'] ?? 'Usuário';
+            });
+          } else {
+            setState(() {
+              userName = 'Campo "nome" não encontrado';
+            });
+          }
+        } else {
+          setState(() {
+            userName = 'Documento do usuário não encontrado';
+          });
+        }
       } catch (e) {
         setState(() {
-          userName = 'Erro ao carregar';
+          userName = 'Erro ao carregar usuário';
         });
+        print('Erro ao buscar o nome do usuário: $e');
       }
+    } else {
+      setState(() {
+        userName = 'Usuário não autenticado';
+      });
     }
   }
 
