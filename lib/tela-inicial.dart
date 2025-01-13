@@ -70,7 +70,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Background com animação
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -80,7 +79,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
               );
             },
           ),
-          // Conteúdo da tela
           Column(
             children: [
               const SizedBox(height: 20),
@@ -119,7 +117,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                           child: FutureBuilder<String>(
                             future: fetchUserName(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return const Text(
                                   'Carregando...',
                                   textAlign: TextAlign.center,

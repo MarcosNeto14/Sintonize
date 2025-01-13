@@ -1,6 +1,6 @@
 # sintonize
 
-A new Flutter project.
+flutter run -d chrome
 
 ## Getting Started
 
