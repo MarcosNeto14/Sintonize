@@ -47,23 +47,31 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return 'Usuário';
   }
 
-  Future<Map<String, String>> fetchMusica() async {
+Future<Map<String, String>> fetchMusica() async {
+  try {
     final musicas = await FirebaseFirestore.instance.collection('musica').get();
 
     if (musicas.docs.isNotEmpty) {
       final musica = musicas.docs.first; // Pega a primeira música, mas você pode randomizar aqui
       return {
-        'nome': musica['nome'] ?? 'Sem Título',
-        'artista': musica['artista'] ?? 'Desconhecido',
+        'track_name': musica['track_name'] ?? 'Sem Título',
+        'artist_name': musica['artist_name'] ?? 'Desconhecido',
       };
     }
 
     return {
-      'titulo': 'Sem Título',
-      'artista': 'Desconhecido',
+      'track_name': 'Sem Título',
+      'artist_name': 'Desconhecido',
     };
-    
+  } catch (e) {
+    print('Erro ao carregar música: $e');
+    return {
+      'track_name': 'Erro ao carregar música',
+      'artist_name': 'Erro ao carregar artista',
+    };
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +199,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 return Column(
                   children: [
                     Text(
-                      musica['titulo']!,
+                      musica['track_name']!,
                       style: const TextStyle(
                         color: Colors.black87,
                         fontSize: 24,
@@ -201,7 +209,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      musica['artista']!,
+                      musica['artist_name']!,
                       style: const TextStyle(
                         color: Colors.black54,
                         fontSize: 18,
