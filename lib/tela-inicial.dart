@@ -47,6 +47,24 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return 'Usuário';
   }
 
+  Future<Map<String, String>> fetchMusica() async {
+    final musicas = await FirebaseFirestore.instance.collection('musica').get();
+
+    if (musicas.docs.isNotEmpty) {
+      final musica = musicas.docs.first; // Pega a primeira música, mas você pode randomizar aqui
+      return {
+        'nome': musica['nome'] ?? 'Sem Título',
+        'artista': musica['artista'] ?? 'Desconhecido',
+      };
+    }
+
+    return {
+      'titulo': 'Sem Título',
+      'artista': 'Desconhecido',
+    };
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,24 +170,50 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
                 height: 180,
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Die With a Smile',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 24,
-                  fontFamily: 'Piazzolla',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                'Lady Gaga feat. Bruno Mars',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18,
-                  fontFamily: 'Piazzolla',
-                ),
-              ),
+              FutureBuilder<Map<String, String>>(
+              future: fetchMusica(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator(); // Indicador de carregamento
+                }
+
+                if (snapshot.hasError || !snapshot.hasData) {
+                  return const Text(
+                    'Erro ao carregar música',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontFamily: 'Piazzolla',
+                    ),
+                  );
+                }
+
+                final musica = snapshot.data!;
+                return Column(
+                  children: [
+                    Text(
+                      musica['titulo']!,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 24,
+                        fontFamily: 'Piazzolla',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      musica['artista']!,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 18,
+                        fontFamily: 'Piazzolla',
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
