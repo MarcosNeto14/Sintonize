@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'usuario.dart';
+import 'usuario.dart'; // Importe a tela de usuário
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,13 +10,31 @@ class AlterarDadosScreen extends StatefulWidget {
   State<AlterarDadosScreen> createState() => _AlterarDadosScreenState();
 }
 
-class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
+class _AlterarDadosScreenState extends State<AlterarDadosScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _dataNascController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _senhaAtualController = TextEditingController();
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _submit() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -141,99 +159,91 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            color: Colors.black,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 70,
-                  height: 70,
-                ),
-                const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Bem-vindo(a), Usuário!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: DynamicBackgroundPainter(_controller.value),
+                child: SizedBox.expand(),
+              );
+            },
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    Center(
+                      child: Image.asset(
+                        'assets/logo-sintoniza.png',
+                        width: 100,
+                        height: 100,
                       ),
                     ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.home, color: Colors.white),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UsuarioScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildField('Nome', _nomeController),
-                      const SizedBox(height: 20),
-                      _buildField('Data de Nascimento (dd/mm/aaaa)',
-                          _dataNascController,
-                          keyboardType: TextInputType.number,
-                          onChanged: _formatDate,
-                          validator: _validateDate),
-                      const SizedBox(height: 20),
-                      _buildField('E-mail', _emailController,
-                          validator: _validateEmail),
-                      const SizedBox(height: 20),
-                      _buildField('Senha Atual', _senhaAtualController,
-                          obscureText: true),
-                      const SizedBox(height: 20),
-                      _buildField('Nova Senha (Opcional)', _senhaController,
-                          obscureText: true),
-                      const SizedBox(height: 30),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF14621),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
+                    const SizedBox(height: 20),
+                    _buildField('Nome', _nomeController),
+                    const SizedBox(height: 20),
+                    _buildField(
+                        'Data de Nascimento (dd/mm/aaaa)', _dataNascController,
+                        keyboardType: TextInputType.number,
+                        onChanged: _formatDate,
+                        validator: _validateDate),
+                    const SizedBox(height: 20),
+                    _buildField('E-mail', _emailController,
+                        validator: _validateEmail),
+                    const SizedBox(height: 20),
+                    _buildField('Senha Atual', _senhaAtualController,
+                        obscureText: true),
+                    const SizedBox(height: 20),
+                    _buildField('Nova Senha (Opcional)', _senhaController,
+                        obscureText: true),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF14621),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                          child: const Text(
-                            'Salvar Alterações',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                        child: const Text(
+                          'Salvar Alterações',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+            ),
+          ),
+          // Botão de retorno para a tela de usuário
+          Positioned(
+            top: 30,
+            right: 30,
+            child: IconButton(
+              icon: const Icon(Icons.person,
+                  color: Color.fromARGB(255, 0, 0, 0), size: 30),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const UsuarioScreen()),
+                );
+              },
             ),
           ),
         ],
@@ -251,17 +261,17 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: Colors.black, fontSize: 18),
         ),
         const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: const TextStyle(color: Colors.black, fontSize: 16),
+          style: const TextStyle(color: Colors.white, fontSize: 16),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFE1E1C1),
+            fillColor: Colors.yellow[900],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
@@ -272,5 +282,54 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
         ),
       ],
     );
+  }
+}
+
+class DynamicBackgroundPainter extends CustomPainter {
+  final double animationValue;
+
+  DynamicBackgroundPainter(this.animationValue);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFF14621).withOpacity(0.3)
+      ..style = PaintingStyle.fill;
+
+    final waveHeight = 50;
+    final waveWidth = size.width / 2;
+
+    for (int i = 0; i < 3; i++) {
+      double shift = animationValue * size.width * 0.5 * (i + 1);
+      Path path = Path();
+      path.moveTo(-shift, size.height);
+      path.lineTo(-shift, size.height / 2);
+
+      for (double x = -shift; x < size.width + waveWidth; x += waveWidth) {
+        path.quadraticBezierTo(
+          x + waveWidth / 4,
+          size.height / 2 - waveHeight,
+          x + waveWidth / 2,
+          size.height / 2,
+        );
+        path.quadraticBezierTo(
+          x + waveWidth * 3 / 4,
+          size.height / 2 + waveHeight,
+          x + waveWidth,
+          size.height / 2,
+        );
+      }
+
+      path.lineTo(size.width + shift, size.height);
+      path.close();
+
+      canvas.drawPath(path, paint);
+      paint.color = paint.color.withOpacity(0.2);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
