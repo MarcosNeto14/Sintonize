@@ -6,6 +6,7 @@ import 'sintonizados.dart';
 import 'main.dart';
 import 'excluir-conta.dart';
 import 'alterar-dados.dart';
+import 'criar_playlist.dart';
 
 class UsuarioScreen extends StatefulWidget {
   const UsuarioScreen({super.key});
@@ -17,11 +18,15 @@ class UsuarioScreen extends StatefulWidget {
 class _UsuarioScreenState extends State<UsuarioScreen> {
   String userName = 'Carregando...';
   final User? user = FirebaseAuth.instance.currentUser;
+  List<DocumentSnapshot> playlists = [];
+  List<DocumentSnapshot> availableSongs = [];
 
   @override
   void initState() {
     super.initState();
     _fetchUserName();
+    _fetchPlaylists();
+    _fetchAvailableSongs();
   }
 
   Future<void> _fetchUserName() async {
@@ -35,25 +40,14 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
 
         if (userDoc.exists) {
           final userData = userDoc.data();
-          if (userData != null && userData.containsKey('nome')) {
-            setState(() {
-              userName = userData['nome'] ?? 'Usuário';
-            });
-          } else {
-            setState(() {
-              userName = 'Campo "nome" não encontrado';
-            });
-          }
-        } else {
           setState(() {
-            userName = 'Documento do usuário não encontrado';
+            userName = userData?['nome'] ?? 'Usuário';
           });
         }
       } catch (e) {
         setState(() {
           userName = 'Erro ao carregar usuário';
         });
-        print('Erro ao buscar o nome do usuário: $e');
       }
     } else {
       setState(() {
@@ -62,10 +56,40 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     }
   }
 
+  Future<void> _fetchPlaylists() async {
+    if (user != null) {
+      try {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('playlists')
+            .where('userId', isEqualTo: user!.uid)
+            .get();
+
+        setState(() {
+          playlists = snapshot.docs;
+        });
+      } catch (e) {
+        print("Erro ao carregar playlists: $e");
+      }
+    }
+  }
+
+  Future<void> _fetchAvailableSongs() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('musica').get();
+
+      setState(() {
+        availableSongs = snapshot.docs;
+      });
+    } catch (e) {
+      print("Erro ao carregar músicas disponíveis: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1),
+      backgroundColor: Colors.black,
       body: Column(
         children: [
           Container(
@@ -110,19 +134,19 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.person, color: Colors.black, size: 60),
+              const Icon(Icons.person, color: Colors.white, size: 60),
               const SizedBox(width: 10),
               Text(
                 userName,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(width: 10),
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.black),
+                icon: const Icon(Icons.edit, color: Colors.white),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -139,46 +163,72 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView(
                 children: [
-                  _buildPlaylistCard('Favoritas'),
-                  const SizedBox(height: 10),
-                  _buildPlaylistCard('Playlist Pop'),
-                  const SizedBox(height: 10),
-                  _buildPlaylistCard('Playlist Rock'),
-                  const SizedBox(height: 10),
-                  _buildPlaylistCard('Playlist BR'),
-                  const SizedBox(height: 30),
-                  _buildMenuButton(
-                    'Sintonizados',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SintonizadosScreen()),
+                  _buildMenuButton('Criar Playlist', Icons.add, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CriarPlaylistScreen(
+                                editPlaylist: {},
+                              )),
+                    ).then((_) => _fetchPlaylists());
+                  }),
+                  const SizedBox(height: 20),
+                  if (playlists.isNotEmpty)
+                    ...playlists.map((playlist) {
+                      final playlistData =
+                          playlist.data() as Map<String, dynamic>;
+                      final name = playlistData['nome'] ?? 'Sem nome';
+                      final musicas = playlistData['musicas'] ?? [];
+                      final musicCount = musicas.length;
+
+                      return ListTile(
+                        title: Text(
+                          name,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          '$musicCount músicas',
+                          style: const TextStyle(color: Colors.white54),
+                        ),
+                        tileColor: Colors.grey[800],
+                        onTap: () {
+                          _showPlaylistDetails(
+                              context, playlist.id, playlistData, musicas);
+                        },
                       );
-                    },
-                  ),
+                    }).toList()
+                  else
+                    const Center(
+                      child: Text(
+                        'Você ainda não criou nenhuma playlist.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  _buildMenuButton('Sintonizados', Icons.music_note, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SintonizadosScreen()),
+                    );
+                  }),
                   const SizedBox(height: 15),
-                  _buildMenuButton(
-                    'Sair da conta',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
-                      );
-                    },
-                  ),
+                  _buildMenuButton('Sair da Conta', Icons.exit_to_app, () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
+                    );
+                  }, isExitButton: true),
                   const SizedBox(height: 15),
-                  _buildMenuButton(
-                    'Excluir conta',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ExcluirContaScreen()),
-                      );
-                    },
-                  ),
+                  _buildMenuButton('Excluir Conta', Icons.delete, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ExcluirContaScreen()),
+                    );
+                  }, isExitButton: true),
                 ],
               ),
             ),
@@ -188,45 +238,222 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     );
   }
 
-  Widget _buildPlaylistCard(String title) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: const Color(0xFFF14621),
-      elevation: 4,
-      child: ListTile(
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+  void _showPlaylistDetails(BuildContext context, String playlistId,
+      Map<String, dynamic> playlistData, List musicas) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            playlistData['nome'] ?? 'Playlist sem nome',
+            style: const TextStyle(color: Colors.black),
           ),
-        ),
-        trailing: const Icon(Icons.playlist_play, color: Colors.white),
-        onTap: () {},
-      ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...musicas.map((musica) {
+                return FutureBuilder<QuerySnapshot>(
+                  future: FirebaseFirestore.instance
+                      .collection('musica')
+                      .where('track_name', isEqualTo: musica)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    if (snapshot.hasError) {
+                      return const Text('Erro ao carregar músicas');
+                    }
+
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      final artistName =
+                          snapshot.data!.docs.first['artist_name'] ??
+                              'Desconhecido';
+
+                      return ListTile(
+                        title: Text(
+                          '$musica - $artistName',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            await _deleteSongFromPlaylist(playlistId, musica);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    } else {
+                      return ListTile(
+                        title: Text(
+                          '$musica - Artista não encontrado',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  await _deletePlaylist(playlistId);
+                  Navigator.pop(context);
+                },
+                child: const Text('Excluir Playlist'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _showAddSongDialog(context, playlistId);
+                },
+                child: const Text('Adicionar Músicas'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildMenuButton(String title,
-      {bool isExitButton = false, VoidCallback? onPressed}) {
+  void _showAddSongDialog(BuildContext context, String playlistId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Adicionar Música'),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FutureBuilder<QuerySnapshot>(
+                    future:
+                        FirebaseFirestore.instance.collection('musica').get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('Erro ao carregar músicas');
+                      }
+
+                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                        return Column(
+                          children: snapshot.data!.docs.map((doc) {
+                            final trackName = doc['track_name'];
+                            final artistName =
+                                doc['artist_name'] ?? 'Desconhecido';
+
+                            return ListTile(
+                              title: Text('$trackName - $artistName'),
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.add, color: Colors.green),
+                                onPressed: () {
+                                  _addSongToPlaylist(playlistId, trackName);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      } else {
+                        return const Text('Nenhuma música disponível');
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _addSongToPlaylist(String playlistId, String song) async {
+    try {
+      final playlistRef =
+          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
+      final playlistDoc = await playlistRef.get();
+      if (playlistDoc.exists) {
+        List<dynamic> musicas = playlistDoc['musicas'] ?? [];
+        if (!musicas.contains(song)) {
+          musicas.add(song);
+          await playlistRef.update({
+            'musicas': musicas,
+          });
+          setState(() {
+            _fetchPlaylists();
+          });
+        }
+      }
+    } catch (e) {
+      print("Erro ao adicionar música: $e");
+    }
+  }
+
+  Future<void> _deleteSongFromPlaylist(String playlistId, String song) async {
+    try {
+      final playlistRef =
+          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
+      final playlistDoc = await playlistRef.get();
+      if (playlistDoc.exists) {
+        List<dynamic> musicas = playlistDoc['musicas'] ?? [];
+        musicas.remove(song);
+
+        await playlistRef.update({
+          'musicas': musicas,
+        });
+
+        setState(() {
+          _fetchPlaylists();
+        });
+      }
+    } catch (e) {
+      print("Erro ao excluir música: $e");
+    }
+  }
+
+  Future<void> _deletePlaylist(String playlistId) async {
+    try {
+      final playlistRef =
+          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
+      await playlistRef.delete();
+
+      setState(() {
+        _fetchPlaylists();
+      });
+    } catch (e) {
+      print("Erro ao excluir playlist: $e");
+    }
+  }
+
+  Widget _buildMenuButton(String title, IconData icon, VoidCallback onTap,
+      {bool isExitButton = false}) {
     return ElevatedButton(
-      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isExitButton ? Colors.red : const Color(0xFFF14621),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        backgroundColor: isExitButton ? Colors.red : Colors.orange,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
         ),
-        elevation: 3,
+        padding: const EdgeInsets.symmetric(vertical: 15),
       ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+      onPressed: onTap,
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 10),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
       ),
     );
   }

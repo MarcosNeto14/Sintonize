@@ -47,31 +47,32 @@ class _TelaInicialScreenState extends State<TelaInicialScreen>
     return 'Usuário';
   }
 
-Future<Map<String, String>> fetchMusica() async {
-  try {
-    final musicas = await FirebaseFirestore.instance.collection('musica').get();
+  Future<Map<String, String>> fetchMusica() async {
+    try {
+      final musicas =
+          await FirebaseFirestore.instance.collection('musica').get();
 
-    if (musicas.docs.isNotEmpty) {
-      final musica = musicas.docs.first; // Pega a primeira música, mas você pode randomizar aqui
+      if (musicas.docs.isNotEmpty) {
+        final musica = musicas.docs
+            .first; // Pega a primeira música, mas você pode randomizar aqui
+        return {
+          'track_name': musica['track_name'] ?? 'Sem Título',
+          'artist_name': musica['artist_name'] ?? 'Desconhecido',
+        };
+      }
+
       return {
-        'track_name': musica['track_name'] ?? 'Sem Título',
-        'artist_name': musica['artist_name'] ?? 'Desconhecido',
+        'track_name': 'Sem Título',
+        'artist_name': 'Desconhecido',
+      };
+    } catch (e) {
+      print('Erro ao carregar música: $e');
+      return {
+        'track_name': 'Erro ao carregar música',
+        'artist_name': 'Erro ao carregar artista',
       };
     }
-
-    return {
-      'track_name': 'Sem Título',
-      'artist_name': 'Desconhecido',
-    };
-  } catch (e) {
-    print('Erro ao carregar música: $e');
-    return {
-      'track_name': 'Erro ao carregar música',
-      'artist_name': 'Erro ao carregar artista',
-    };
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -178,49 +179,48 @@ Future<Map<String, String>> fetchMusica() async {
               ),
               const SizedBox(height: 20),
               FutureBuilder<Map<String, String>>(
-              future: fetchMusica(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(); // Indicador de carregamento
-                }
+                future: fetchMusica(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator(); // Indicador de carregamento
+                  }
 
-                if (snapshot.hasError || !snapshot.hasData) {
-                  return const Text(
-                    'Erro ao carregar música',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontFamily: 'Piazzolla',
-                    ),
-                  );
-                }
-
-                final musica = snapshot.data!;
-                return Column(
-                  children: [
-                    Text(
-                      musica['track_name']!,
-                      style: const TextStyle(
+                  if (snapshot.hasError || !snapshot.hasData) {
+                    return const Text(
+                      'Erro ao carregar música',
+                      style: TextStyle(
                         color: Colors.black87,
-                        fontSize: 24,
-                        fontFamily: 'Piazzolla',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      musica['artist_name']!,
-                      style: const TextStyle(
-                        color: Colors.black54,
                         fontSize: 18,
                         fontFamily: 'Piazzolla',
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                    );
+                  }
 
+                  final musica = snapshot.data!;
+                  return Column(
+                    children: [
+                      Text(
+                        musica['track_name']!,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 24,
+                          fontFamily: 'Piazzolla',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        musica['artist_name']!,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 18,
+                          fontFamily: 'Piazzolla',
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
