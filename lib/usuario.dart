@@ -292,74 +292,57 @@ class _UsuarioScreenState extends State<UsuarioScreen>
   }
 
   void _showAddSongDialog(BuildContext context, String playlistId) {
-    final TextEditingController _songController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Text(
-            'Adicionar Música',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins',
+          title: const Text('Adicionar Música'),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FutureBuilder<QuerySnapshot>(
+                    future:
+                        FirebaseFirestore.instance.collection('musica').get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('Erro ao carregar músicas');
+                      }
+
+                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                        return Column(
+                          children: snapshot.data!.docs.map((doc) {
+                            final trackName = doc['track_name'];
+                            final artistName =
+                                doc['artist_name'] ?? 'Desconhecido';
+
+                            return ListTile(
+                              title: Text('$trackName - $artistName'),
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.add, color: Colors.green),
+                                onPressed: () {
+                                  _addSongToPlaylist(playlistId, trackName);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      } else {
+                        return const Text('Nenhuma música disponível');
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _songController,
-                decoration: const InputDecoration(
-                  labelText: 'Nome da Música',
-                  labelStyle: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'Poppins',
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final songName = _songController.text.trim();
-                  if (songName.isNotEmpty) {
-                    await _addSongToPlaylist(playlistId, songName);
-                    Navigator.pop(
-                        context); // Fecha o diálogo de adicionar música
-                    // Atualiza o popup da playlist para refletir a nova música
-                    _showPlaylistDetails(context, playlistId, {}, [songName]);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Por favor, insira o nome da música.'),
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF14621),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  'Adicionar',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ),
-            ],
           ),
         );
       },

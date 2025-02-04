@@ -120,14 +120,14 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen>
                     '🎵 $_musica',
                     style: const TextStyle(
                       fontSize: 18,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   Text(
                     'Artista: $_artista',
                     style: const TextStyle(
                       fontSize: 18,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 40),
