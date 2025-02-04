@@ -160,7 +160,7 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
                     decoration: InputDecoration(
                       hintText: 'Pesquisar Sintonizados',
                       filled: true,
-                      fillColor: Colors.yellow[900],
+                      fillColor: Color(0xFFF14621),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
