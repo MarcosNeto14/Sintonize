@@ -139,7 +139,10 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                   );
                 }
               },
-              child: const Text('Salvar Playlist'),
+              child: const Text(
+                'Salvar Playlist',
+                style: TextStyle(color: Colors.white),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF14621),
               ),
