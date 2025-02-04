@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'tela-inicial.dart';
 
 class CriarPlaylistScreen extends StatefulWidget {
   const CriarPlaylistScreen(
@@ -12,20 +13,17 @@ class CriarPlaylistScreen extends StatefulWidget {
 
 class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
   final TextEditingController _nomeController = TextEditingController();
-  final TextEditingController _searchController =
-      TextEditingController(); // Controller de busca
-  List<String> _musicasSelecionadas = []; // Músicas selecionadas pelo usuário
-  List<DocumentSnapshot> _musicasDataset = []; // Músicas do dataset
-  List<DocumentSnapshot> _musicasFiltradas =
-      []; // Músicas filtradas com base na busca
+  final TextEditingController _searchController = TextEditingController();
+  List<String> _musicasSelecionadas = [];
+  List<DocumentSnapshot> _musicasDataset = [];
+  List<DocumentSnapshot> _musicasFiltradas = [];
   String? _playlistName;
 
   @override
   void initState() {
     super.initState();
-    _fetchMusicas(); // Puxa as músicas do Firestore
-    _searchController.addListener(
-        _filterMusicas); // Adiciona o listener para a pesquisa em tempo real
+    _fetchMusicas();
+    _searchController.addListener(_filterMusicas);
   }
 
   Future<void> _fetchMusicas() async {
@@ -34,24 +32,20 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
           await FirebaseFirestore.instance.collection('musica').get();
       setState(() {
         _musicasDataset = snapshot.docs;
-        _musicasFiltradas =
-            _musicasDataset; // Inicializa a lista filtrada com todas as músicas
+        _musicasFiltradas = _musicasDataset;
       });
     } catch (e) {
       print("Erro ao buscar músicas: $e");
     }
   }
 
-  // Função de filtro de músicas
   void _filterMusicas() {
     String query = _searchController.text.toLowerCase();
     setState(() {
       _musicasFiltradas = _musicasDataset.where((musica) {
         String musicaNome = musica['track_name'].toLowerCase();
         String artistName = musica['artist_name']?.toLowerCase() ?? '';
-        return musicaNome.contains(query) ||
-            artistName
-                .contains(query); // Filtra pelo nome da música ou do artista
+        return musicaNome.contains(query) || artistName.contains(query);
       }).toList();
     });
   }
@@ -59,9 +53,23 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE1E1C1),
       appBar: AppBar(
         title: const Text('Criar Playlist'),
         backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home, color: Colors.white, size: 30),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TelaInicialScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -77,7 +85,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
               },
             ),
             const SizedBox(height: 20),
-            // Barra de pesquisa
             TextField(
               controller: _searchController,
               decoration: const InputDecoration(
@@ -86,9 +93,7 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Exibe a lista de músicas filtradas
             Expanded(
-              // Use Expanded para evitar overflow
               child: _musicasFiltradas.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
@@ -100,8 +105,7 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                             musica['artist_name'] ?? 'Desconhecido';
 
                         return ListTile(
-                          title: Text(
-                              '$musicaNome - $artistName'), // Exibe o nome da música e do artista
+                          title: Text('$musicaNome - $artistName'),
                           trailing: IconButton(
                             icon: Icon(
                               _musicasSelecionadas.contains(musicaNome)
@@ -136,6 +140,9 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                 }
               },
               child: const Text('Salvar Playlist'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF14621),
+              ),
             ),
           ],
         ),
@@ -148,16 +155,14 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
 
     if (user != null) {
       try {
-        // Cria um documento na coleção 'playlists' com as músicas selecionadas
         await FirebaseFirestore.instance.collection('playlists').add({
           'userId': user.uid,
           'nome': _playlistName,
-          'musicas': _musicasSelecionadas, // Lista de músicas na playlist
+          'musicas': _musicasSelecionadas,
           'dataCriacao': Timestamp.now(),
         });
 
-        // Depois de salvar, pode retornar ou mostrar um sucesso
-        Navigator.pop(context); // Volta para a tela anterior
+        Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao salvar a playlist: $e')),
