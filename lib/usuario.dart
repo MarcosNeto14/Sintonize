@@ -282,7 +282,6 @@ class _UsuarioScreenState extends State<UsuarioScreen>
 
   void _showPlaylistDetails(BuildContext context, String playlistId,
       Map<String, dynamic> playlistData, List<dynamic> musicas) {
-    // Converte a lista de músicas para List<String>
     final List<String> musicasList = List<String>.from(musicas);
 
     Navigator.push(
@@ -291,7 +290,7 @@ class _UsuarioScreenState extends State<UsuarioScreen>
         builder: (context) => DetalhesPlaylistScreen(
           playlistId: playlistId,
           playlistData: playlistData,
-          musicas: musicasList, // Passando a lista de músicas convertida
+          musicas: musicasList,
         ),
       ),
     );

@@ -23,7 +23,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
   @override
   void initState() {
     super.initState();
-    _musicas = List.from(widget.musicas); // Inicializa com as músicas passadas
+    _musicas = List.from(widget.musicas);
   }
 
   Future<void> _deleteSongFromPlaylist(String song) async {
@@ -57,7 +57,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
           .doc(widget.playlistId);
       await playlistRef.delete();
 
-      Navigator.pop(context); // Volta para a tela anterior
+      Navigator.pop(context);
     } catch (e) {
       print("Erro ao excluir playlist: $e");
     }
