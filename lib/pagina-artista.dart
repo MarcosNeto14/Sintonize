@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tela-inicial.dart';
 
 class ArtistaScreen extends StatelessWidget {
-  final String artistaNome; // Nome do artista a ser exibido
+  final String artistaNome;
 
   const ArtistaScreen({super.key, required this.artistaNome});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1), // Fundo da tela
+      backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
-          // Barra superior preta com logo, título do artista e botão "Home"
+          // Barra superior preta com logo e botão "Home"
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -40,14 +41,30 @@ class ArtistaScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Expanded(
-            child: ListView(
-              children: [
-                _buildMusicItem('Just the Way You Are', context),
-                _buildMusicItem('Treasure', context),
-                _buildMusicItem('Locked Out of Heaven', context),
-                _buildMusicItem('24K Magic', context),
-                _buildMusicItem('Grenade', context),
-              ],
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('musica')
+                  .where('artist_name', isEqualTo: artistaNome)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                      child: Text('Nenhuma música encontrada.'));
+                }
+
+                var musicas = snapshot.data!.docs;
+
+                return ListView.builder(
+                  itemCount: musicas.length,
+                  itemBuilder: (context, index) {
+                    var musica = musicas[index];
+                    return _buildMusicItem(musica['track_name'], context);
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -70,7 +87,7 @@ class ArtistaScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_forward, color: Colors.white),
           color: const Color(0xFFF14621),
           onPressed: () {
-            // Ação ao clicar no item de música
+            // Ação ao clicar na música
           },
         ),
         tileColor: const Color(0xFFF14621),

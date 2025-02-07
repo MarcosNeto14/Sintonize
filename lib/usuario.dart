@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sintonize/detalhesplaylist.dart';
 import 'tela-inicial.dart';
 import 'sintonizados.dart';
 import 'main.dart';
@@ -21,8 +22,9 @@ class _UsuarioScreenState extends State<UsuarioScreen>
   final User? user = FirebaseAuth.instance.currentUser;
   List<DocumentSnapshot> playlists = [];
   List<DocumentSnapshot> availableSongs = [];
+  bool isLoadingPlaylists = true;
+  bool isLoadingSongs = true;
 
-  // Adicionando o AnimationController
   late AnimationController _controller;
 
   @override
@@ -32,7 +34,6 @@ class _UsuarioScreenState extends State<UsuarioScreen>
     _fetchPlaylists();
     _fetchAvailableSongs();
 
-    // Inicializando o AnimationController
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -41,7 +42,6 @@ class _UsuarioScreenState extends State<UsuarioScreen>
 
   @override
   void dispose() {
-    // Dispose do AnimationController para evitar vazamentos de memória
     _controller.dispose();
     super.dispose();
   }
@@ -83,8 +83,12 @@ class _UsuarioScreenState extends State<UsuarioScreen>
 
         setState(() {
           playlists = snapshot.docs;
+          isLoadingPlaylists = false;
         });
       } catch (e) {
+        setState(() {
+          isLoadingPlaylists = false;
+        });
         print("Erro ao carregar playlists: $e");
       }
     }
@@ -97,8 +101,12 @@ class _UsuarioScreenState extends State<UsuarioScreen>
 
       setState(() {
         availableSongs = snapshot.docs;
+        isLoadingSongs = false;
       });
     } catch (e) {
+      setState(() {
+        isLoadingSongs = false;
+      });
       print("Erro ao carregar músicas disponíveis: $e");
     }
   }
@@ -125,31 +133,21 @@ class _UsuarioScreenState extends State<UsuarioScreen>
                 child: Card(
                   elevation: 8,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 15,
-                    ),
+                        vertical: 20, horizontal: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFFF9E80),
-                          Color(0xFFF14621),
-                        ],
+                        colors: [Color(0xFFFF9E80), Color(0xFFF14621)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 50,
-                        ),
+                        const Icon(Icons.person, color: Colors.white, size: 50),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -178,13 +176,14 @@ class _UsuarioScreenState extends State<UsuarioScreen>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CriarPlaylistScreen(
-                                    editPlaylist: {},
-                                  )),
+                              builder: (context) =>
+                                  CriarPlaylistScreen(editPlaylist: {})),
                         ).then((_) => _fetchPlaylists());
                       }),
                       const SizedBox(height: 20),
-                      if (playlists.isNotEmpty)
+                      if (isLoadingPlaylists)
+                        const Center(child: CircularProgressIndicator())
+                      else if (playlists.isNotEmpty)
                         ...playlists.map((playlist) {
                           final playlistData =
                               playlist.data() as Map<String, dynamic>;
@@ -195,25 +194,18 @@ class _UsuarioScreenState extends State<UsuarioScreen>
                           return Card(
                             elevation: 4,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                                borderRadius: BorderRadius.circular(15)),
                             child: ListTile(
-                              title: Text(
-                                name,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontFamily: 'Piazzolla',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              subtitle: Text(
-                                '$musicCount músicas',
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontFamily: 'Piazzolla',
-                                  fontSize: 14,
-                                ),
-                              ),
+                              title: Text(name,
+                                  style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontFamily: 'Piazzolla',
+                                      fontSize: 18)),
+                              subtitle: Text('$musicCount músicas',
+                                  style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontFamily: 'Piazzolla',
+                                      fontSize: 14)),
                               tileColor: Colors.white,
                               onTap: () {
                                 _showPlaylistDetails(context, playlist.id,
@@ -224,15 +216,12 @@ class _UsuarioScreenState extends State<UsuarioScreen>
                         }).toList()
                       else
                         const Center(
-                          child: Text(
-                            'Você ainda não criou nenhuma playlist.',
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontFamily: 'Piazzolla',
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
+                            child: Text(
+                                'Você ainda não criou nenhuma playlist.',
+                                style: TextStyle(
+                                    color: Colors.orange,
+                                    fontFamily: 'Piazzolla',
+                                    fontSize: 18))),
                       const SizedBox(height: 20),
                       _buildMenuButton('Sintonizados', Icons.music_note, () {
                         Navigator.push(
@@ -273,10 +262,10 @@ class _UsuarioScreenState extends State<UsuarioScreen>
             ],
           ),
           Positioned(
-            top: 30,
+            top: 35,
             right: 30,
             child: IconButton(
-              icon: const Icon(Icons.home, color: Colors.white, size: 30),
+              icon: const Icon(Icons.home, color: Colors.white, size: 50),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -291,329 +280,36 @@ class _UsuarioScreenState extends State<UsuarioScreen>
     );
   }
 
-  void _showAddSongDialog(BuildContext context, String playlistId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Adicionar Música'),
-          content: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FutureBuilder<QuerySnapshot>(
-                    future:
-                        FirebaseFirestore.instance.collection('musica').get(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      if (snapshot.hasError) {
-                        return const Text('Erro ao carregar músicas');
-                      }
-
-                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                        return Column(
-                          children: snapshot.data!.docs.map((doc) {
-                            final trackName = doc['track_name'];
-                            final artistName =
-                                doc['artist_name'] ?? 'Desconhecido';
-
-                            return ListTile(
-                              title: Text('$trackName - $artistName'),
-                              trailing: IconButton(
-                                icon:
-                                    const Icon(Icons.add, color: Colors.green),
-                                onPressed: () {
-                                  _addSongToPlaylist(playlistId, trackName);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      } else {
-                        return const Text('Nenhuma música disponível');
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _showPlaylistDetails(BuildContext context, String playlistId,
-      Map<String, dynamic> playlistData, List musicas) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: Text(
-                playlistData['nome'] ?? 'Playlist sem nome',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...musicas.map((musica) {
-                      return FutureBuilder<QuerySnapshot>(
-                        future: FirebaseFirestore.instance
-                            .collection('musica')
-                            .where('track_name', isEqualTo: musica)
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          }
+      Map<String, dynamic> playlistData, List<dynamic> musicas) {
+    // Converte a lista de músicas para List<String>
+    final List<String> musicasList = List<String>.from(musicas);
 
-                          if (snapshot.hasError) {
-                            return const Text(
-                              'Erro ao carregar músicas',
-                              style: TextStyle(color: Colors.black),
-                            );
-                          }
-
-                          if (snapshot.hasData &&
-                              snapshot.data!.docs.isNotEmpty) {
-                            final artistName =
-                                snapshot.data!.docs.first['artist_name'] ??
-                                    'Desconhecido';
-
-                            return ListTile(
-                              title: Text(
-                                '$musica - $artistName',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: 'Poppins',
-                                ),
-                              ),
-                              trailing: IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () async {
-                                  bool confirm = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Confirmar Exclusão'),
-                                        content: Text(
-                                            'Deseja excluir a música $musica da playlist?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: const Text('Cancelar'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
-                                            child: const Text('Excluir'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (confirm == true) {
-                                    await _deleteSongFromPlaylist(
-                                        playlistId, musica);
-                                    setState(() {
-                                      musicas.remove(musica);
-                                    });
-                                  }
-                                },
-                              ),
-                            );
-                          } else {
-                            return ListTile(
-                              title: Text(
-                                '$musica - Artista não encontrado',
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    }).toList(),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        bool confirm = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Confirmar Exclusão'),
-                              content: const Text(
-                                  'Deseja excluir esta playlist permanentemente?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Excluir'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-
-                        if (confirm == true) {
-                          await _deletePlaylist(playlistId);
-                          Navigator.pop(context);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        'Excluir Playlist',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        _showAddSongDialog(context, playlistId);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF14621),
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        'Adicionar Músicas',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetalhesPlaylistScreen(
+          playlistId: playlistId,
+          playlistData: playlistData,
+          musicas: musicasList, // Passando a lista de músicas convertida
+        ),
+      ),
     );
   }
 
-  Future<void> _addSongToPlaylist(String playlistId, String song) async {
-    try {
-      final playlistRef =
-          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
-      final playlistDoc = await playlistRef.get();
-      if (playlistDoc.exists) {
-        List<dynamic> musicas = playlistDoc['musicas'] ?? [];
-        if (!musicas.contains(song)) {
-          musicas.add(song);
-          await playlistRef.update({
-            'musicas': musicas,
-          });
-          setState(() {
-            _fetchPlaylists();
-          });
-        }
-      }
-    } catch (e) {
-      print("Erro ao adicionar música: $e");
-    }
-  }
-
-  Future<void> _deleteSongFromPlaylist(String playlistId, String song) async {
-    try {
-      final playlistRef =
-          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
-      final playlistDoc = await playlistRef.get();
-      if (playlistDoc.exists) {
-        List<dynamic> musicas = playlistDoc['musicas'] ?? [];
-        musicas.remove(song);
-
-        await playlistRef.update({
-          'musicas': musicas,
-        });
-
-        setState(() {
-          _fetchPlaylists();
-        });
-      }
-    } catch (e) {
-      print("Erro ao excluir música: $e");
-    }
-  }
-
-  Future<void> _deletePlaylist(String playlistId) async {
-    try {
-      final playlistRef =
-          FirebaseFirestore.instance.collection('playlists').doc(playlistId);
-      await playlistRef.delete();
-
-      setState(() {
-        _fetchPlaylists();
-      });
-    } catch (e) {
-      print("Erro ao excluir playlist: $e");
-    }
-  }
-
-  Widget _buildMenuButton(String title, IconData icon, VoidCallback onTap,
+  Widget _buildMenuButton(String title, IconData icon, VoidCallback onPressed,
       {bool isExitButton = false}) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: isExitButton ? Colors.red : Colors.orange,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        shadowColor: Colors.black.withOpacity(0.3),
-        elevation: 5,
+        backgroundColor: isExitButton
+            ? Colors.red
+            : const Color.fromARGB(255, 255, 255, 255),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      onPressed: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ],
-      ),
+      onPressed: onPressed,
+      icon: Icon(icon, size: 24),
+      label: Text(title, style: const TextStyle(fontSize: 16)),
     );
   }
 }
@@ -639,18 +335,10 @@ class DynamicBackgroundPainter extends CustomPainter {
       path.lineTo(-shift, size.height / 2);
 
       for (double x = -shift; x < size.width + waveWidth; x += waveWidth) {
-        path.quadraticBezierTo(
-          x + waveWidth / 4,
-          size.height / 2 - waveHeight,
-          x + waveWidth / 2,
-          size.height / 2,
-        );
-        path.quadraticBezierTo(
-          x + waveWidth * 3 / 4,
-          size.height / 2 + waveHeight,
-          x + waveWidth,
-          size.height / 2,
-        );
+        path.quadraticBezierTo(x + waveWidth / 4, size.height / 2 - waveHeight,
+            x + waveWidth / 2, size.height / 2);
+        path.quadraticBezierTo(x + waveWidth * 3 / 4,
+            size.height / 2 + waveHeight, x + waveWidth, size.height / 2);
       }
 
       path.lineTo(size.width + shift, size.height);

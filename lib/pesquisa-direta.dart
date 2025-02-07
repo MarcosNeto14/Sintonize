@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tela-inicial.dart';
 import 'barra_de_pesquisa.dart';
 
@@ -11,24 +12,36 @@ class PesquisaDiretaScreen extends StatefulWidget {
 
 class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final List<Map<String, String>> _musicList = [
-    {'music': 'Just the Way You Are', 'artist': 'Bruno Mars'},
-    {'music': 'Treasure', 'artist': 'Bruno Mars'},
-    {'music': 'With You', 'artist': 'Chris Brown'},
-    {'music': 'Forever', 'artist': 'Chris Brown'},
-  ];
-
+  List<Map<String, String>> _allMusicList = [];
   List<Map<String, String>> _filteredMusicList = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredMusicList = List.from(_musicList);
+    _fetchMusic();
   }
 
+  // Função para buscar músicas do Firestore
+  void _fetchMusic() async {
+    FirebaseFirestore.instance.collection('musica').get().then((snapshot) {
+      List<Map<String, String>> musicList = snapshot.docs.map((doc) {
+        return {
+          'music': (doc['track_name'] ?? 'Desconhecido').toString(),
+          'artist': (doc['artist_name'] ?? 'Desconhecido').toString(),
+        };
+      }).toList();
+
+      setState(() {
+        _allMusicList = musicList;
+        _filteredMusicList = List.from(musicList);
+      });
+    });
+  }
+
+  // Função para filtrar as músicas conforme o usuário digita
   void _filterMusicList(String query) {
     setState(() {
-      _filteredMusicList = _musicList.where((musicItem) {
+      _filteredMusicList = _allMusicList.where((musicItem) {
         final music = musicItem['music']!.toLowerCase();
         final artist = musicItem['artist']!.toLowerCase();
         return music.contains(query.toLowerCase()) ||
@@ -43,6 +56,7 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
+          // Barra superior com logo e botão home
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -68,43 +82,48 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
               ],
             ),
           ),
+          // Barra de pesquisa
           BarraDePesquisa(
             controller: _searchController,
             hintText: 'Pesquise por artista ou música...',
             onChanged: _filterMusicList,
           ),
+          // Lista de músicas
           Expanded(
-            child: ListView.builder(
-              itemCount: _filteredMusicList.length,
-              itemBuilder: (context, index) {
-                final musicItem = _filteredMusicList[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 10, horizontal: 20),
-                  color: const Color(0xFFE1E1C1),
-                  child: ListTile(
-                    title: Text(
-                      musicItem['music']!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(musicItem['artist']!),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                      color: const Color(0xFFF14621),
-                      onPressed: () {
-                        // Implementar ação ao clicar no item
-                      },
-                    ),
-                    tileColor: const Color(0xFFF14621),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+            child: _filteredMusicList.isEmpty
+                ? const Center(child: Text('Nenhuma música encontrada.'))
+                : ListView.builder(
+                    itemCount: _filteredMusicList.length,
+                    itemBuilder: (context, index) {
+                      final musicItem = _filteredMusicList[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        color: const Color(0xFFE1E1C1),
+                        child: ListTile(
+                          title: Text(
+                            musicItem['music']!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(musicItem['artist']!),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.arrow_forward,
+                                color: Colors.white),
+                            color: const Color(0xFFF14621),
+                            onPressed: () {
+                              // Implementar ação ao clicar no item
+                            },
+                          ),
+                          tileColor: const Color(0xFFF14621),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
