@@ -287,10 +287,11 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
   }
 
   void _showPlaylistDetails(BuildContext context, String playlistId,
-      Map<String, dynamic> playlistData, List<dynamic> musicas) {
+      Map<String, dynamic> playlistData, List<dynamic> musicas) async {
     final List<String> musicasList = List<String>.from(musicas);
 
-    Navigator.push(
+    // Aguarda o retorno da tela de detalhes da playlist
+    final playlistExcluida = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DetalhesPlaylistScreen(
@@ -300,6 +301,11 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         ),
       ),
     );
+
+    // Se a playlist foi excluída, recarrega a lista de playlists
+    if (playlistExcluida == true) {
+      _fetchPlaylists();
+    }
   }
 
   Widget _buildMenuButton(String title, IconData icon, VoidCallback onPressed,

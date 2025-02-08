@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'tela-inicial.dart'; // Importe a tela inicial para o botão de voltar
 
 class DetalhesPlaylistScreen extends StatefulWidget {
   final String playlistId;
@@ -57,20 +58,59 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
           .doc(widget.playlistId);
       await playlistRef.delete();
 
-      Navigator.pop(context);
+      // Retorna true para indicar que a playlist foi excluída
+      Navigator.pop(context, true);
     } catch (e) {
       print("Erro ao excluir playlist: $e");
+      // Retorna false em caso de erro
+      Navigator.pop(context, false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.playlistData['nome'] ?? 'Playlist sem nome'),
-      ),
+      backgroundColor: Colors.white, // Fundo branco
       body: Column(
         children: [
+          // Barra superior com logo e botão de voltar
+          Container(
+            color: const Color(0xFFF14621),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 10), // Reduzido o padding vertical
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.pop(context); // Volta para a tela anterior
+                  },
+                ),
+                const SizedBox(width: 10), // Espaço entre o ícone e o logo
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 60, // Reduzido o tamanho do logo
+                  height: 60,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Título da playlist
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              widget.playlistData['nome'] ?? 'Playlist sem nome',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFF14621),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Lista de músicas
           Expanded(
             child: ListView.builder(
               itemCount: _musicas.length,
@@ -83,13 +123,15 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                       .get(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     if (snapshot.hasError) {
-                      return const Text(
-                        'Erro ao carregar músicas',
-                        style: TextStyle(color: Colors.black),
+                      return const Center(
+                        child: Text(
+                          'Erro ao carregar músicas',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       );
                     }
 
@@ -97,46 +139,68 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                       final artistName =
                           snapshot.data!.docs.first['artist_name'] ??
                               'Desconhecido';
-                      return ListTile(
-                        title: Text(
-                          '$musica - $artistName',
-                          style: const TextStyle(color: Colors.black),
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            bool confirm = await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Confirmar Exclusão'),
-                                  content: Text(
-                                      'Deseja excluir a música $musica da playlist?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text('Cancelar'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: const Text('Excluir'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                        child: ListTile(
+                          title: Text(
+                            '$musica - $artistName',
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              bool confirm = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Confirmar Exclusão'),
+                                    content: Text(
+                                        'Deseja excluir a música $musica da playlist?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text('Cancelar'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: const Text('Excluir'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
 
-                            if (confirm == true) {
-                              await _deleteSongFromPlaylist(musica);
-                            }
-                          },
+                              if (confirm == true) {
+                                await _deleteSongFromPlaylist(musica);
+                              }
+                            },
+                          ),
                         ),
                       );
                     } else {
-                      return ListTile(
-                        title: Text('$musica - Artista não encontrado'),
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            '$musica - Artista não encontrado',
+                            style: const TextStyle(color: Colors.black87),
+                          ),
+                        ),
                       );
                     }
                   },
@@ -144,20 +208,30 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
               },
             ),
           ),
-          ElevatedButton(
-            onPressed: _deletePlaylist,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+          const SizedBox(height: 20),
+          // Botão de excluir playlist
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ElevatedButton(
+              onPressed: _deletePlaylist,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text(
+                'Excluir Playlist',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             ),
-            child: const Text(
-              'Excluir Playlist',
-              style: TextStyle(color: Colors.white),
-            ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
