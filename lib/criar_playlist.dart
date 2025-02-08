@@ -53,47 +53,71 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1),
-      appBar: AppBar(
-        title: const Text('Criar Playlist'),
-        backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white, size: 30),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TelaInicialScreen(),
+      backgroundColor: Colors.white, // Fundo branco
+      body: Column(
+        children: [
+          // Barra superior com logo e botão de voltar
+          Container(
+            color: const Color(0xFFF14621),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 10), // Reduzido o padding vertical
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.pop(context); // Volta para a tela anterior
+                  },
                 ),
-              );
-            },
+                const SizedBox(width: 10), // Espaço entre o ícone e o logo
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 60, // Reduzido o tamanho do logo
+                  height: 60,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            TextField(
+          const SizedBox(height: 20),
+          // Campo de nome da playlist
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
               controller: _nomeController,
-              decoration: const InputDecoration(labelText: 'Nome da Playlist'),
+              decoration: InputDecoration(
+                labelText: 'Nome da Playlist',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
               onChanged: (value) {
                 setState(() {
                   _playlistName = value;
                 });
               },
             ),
-            const SizedBox(height: 20),
-            TextField(
+          ),
+          const SizedBox(height: 20),
+          // Campo de pesquisa de músicas
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Pesquisar Música ou Artista',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            Expanded(
+          ),
+          const SizedBox(height: 20),
+          // Lista de músicas
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _musicasFiltradas.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
@@ -104,31 +128,43 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                         String artistName =
                             musica['artist_name'] ?? 'Desconhecido';
 
-                        return ListTile(
-                          title: Text('$musicaNome - $artistName'),
-                          trailing: IconButton(
-                            icon: Icon(
-                              _musicasSelecionadas.contains(musicaNome)
-                                  ? Icons.check_box
-                                  : Icons.check_box_outline_blank,
-                              color: Colors.orange,
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            title: Text('$musicaNome - $artistName'),
+                            trailing: IconButton(
+                              icon: Icon(
+                                _musicasSelecionadas.contains(musicaNome)
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                                color: const Color(0xFFF14621),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  if (_musicasSelecionadas
+                                      .contains(musicaNome)) {
+                                    _musicasSelecionadas.remove(musicaNome);
+                                  } else {
+                                    _musicasSelecionadas.add(musicaNome);
+                                  }
+                                });
+                              },
                             ),
-                            onPressed: () {
-                              setState(() {
-                                if (_musicasSelecionadas.contains(musicaNome)) {
-                                  _musicasSelecionadas.remove(musicaNome);
-                                } else {
-                                  _musicasSelecionadas.add(musicaNome);
-                                }
-                              });
-                            },
                           ),
                         );
                       },
                     ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
+          ),
+          const SizedBox(height: 20),
+          // Botão de salvar playlist
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ElevatedButton(
               onPressed: () {
                 if (_playlistName != null && _playlistName!.isNotEmpty) {
                   _salvarPlaylist();
@@ -139,16 +175,25 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                   );
                 }
               },
-              child: const Text(
-                'Salvar Playlist',
-                style: TextStyle(color: Colors.white),
-              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF14621),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text(
+                'Salvar Playlist',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'usuario.dart';
 import 'perfil-sintonizado.dart';
+import 'tela-inicial.dart'; // Importe a tela inicial para o botão de voltar
 
 class SintonizadosScreen extends StatefulWidget {
   const SintonizadosScreen({super.key});
@@ -11,30 +12,18 @@ class SintonizadosScreen extends StatefulWidget {
   _SintonizadosScreenState createState() => _SintonizadosScreenState();
 }
 
-class _SintonizadosScreenState extends State<SintonizadosScreen>
-    with SingleTickerProviderStateMixin {
+class _SintonizadosScreenState extends State<SintonizadosScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<DocumentSnapshot> _sintonizados = [];
   List<DocumentSnapshot> _allUsers = [];
   final User? user = FirebaseAuth.instance.currentUser;
-  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 10),
-    )..repeat();
     _fetchSintonizados();
     _fetchAllUsers();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   Future<void> _fetchSintonizados() async {
@@ -130,58 +119,85 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
         .toList();
 
     return Scaffold(
-      body: Stack(
+      backgroundColor: Colors.white, // Fundo branco
+      body: Column(
         children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: DynamicBackgroundPainter(_controller.value),
-                child: SizedBox.expand(),
-              );
-            },
+          // Barra superior com logo e botão de voltar
+          Container(
+            color: const Color(0xFFF14621),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 10), // Reduzido o padding vertical
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TelaInicialScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 10), // Espaço entre o ícone e o logo
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 60, // Reduzido o tamanho do logo
+                  height: 60,
+                ),
+              ],
+            ),
           ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+          // Barra de pesquisa
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Pesquisar Sintonizados',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 20,
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+            ),
+          ),
+          // Lista de sintonizados
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  Center(
-                    child: Image.asset(
-                      'assets/logo-sintoniza.png',
-                      width: 100,
-                      height: 100,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Pesquisar Sintonizados',
-                      filled: true,
-                      fillColor: Color(0xFFF14621),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white),
-                      hintStyle: const TextStyle(color: Colors.white),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   const Text(
                     'Sintonizados',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                      color: Color(0xFFF14621),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -192,41 +208,54 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
                     itemBuilder: (context, index) {
                       final user = filteredSintonizados[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        color: const Color(0xFFF14621),
-                        elevation: 4,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/logo-sintoniza.png'),
-                            radius: 30,
-                          ),
-                          title: Text(
-                            user['nome'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFF14621),
+                                Color(0xFFFF9E80),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PerfilSintonizadoScreen(
-                                  userId: user.id,
-                                  nome: user['nome'],
-                                ),
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/logo-sintoniza.png'),
+                              radius: 30,
+                            ),
+                            title: Text(
+                              user['nome'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                            );
-                          },
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.white),
-                            onPressed: () {
-                              _removerSintonizado(user.id);
+                            ),
+                            trailing: IconButton(
+                              icon:
+                                  const Icon(Icons.delete, color: Colors.white),
+                              onPressed: () {
+                                _removerSintonizado(user.id);
+                              },
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PerfilSintonizadoScreen(
+                                    userId: user.id,
+                                    nome: user['nome'],
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         ),
@@ -239,7 +268,7 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                      color: Color(0xFFF14621),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -250,31 +279,43 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
                     itemBuilder: (context, index) {
                       final user = filteredAllUsers[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        color: const Color(0xFFF14621),
-                        elevation: 4,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/logo-sintoniza.png'),
-                            radius: 30,
-                          ),
-                          title: Text(
-                            user['nome'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFF14621),
+                                Color(0xFFFF9E80),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.white),
-                            onPressed: () {
-                              _adicionarSintonizado(user.id);
-                            },
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/logo-sintoniza.png'),
+                              radius: 30,
+                            ),
+                            title: Text(
+                              user['nome'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              onPressed: () {
+                                _adicionarSintonizado(user.id);
+                              },
+                            ),
                           ),
                         ),
                       );
@@ -284,73 +325,8 @@ class _SintonizadosScreenState extends State<SintonizadosScreen>
               ),
             ),
           ),
-          Positioned(
-            top: 30,
-            right: 30,
-            child: IconButton(
-              icon: const Icon(Icons.person,
-                  color: Color.fromARGB(255, 0, 0, 0), size: 30),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const UsuarioScreen(),
-                  ),
-                );
-              },
-            ),
-          ),
         ],
       ),
     );
-  }
-}
-
-class DynamicBackgroundPainter extends CustomPainter {
-  final double animationValue;
-
-  DynamicBackgroundPainter(this.animationValue);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFF14621).withOpacity(0.3)
-      ..style = PaintingStyle.fill;
-
-    final waveHeight = 50;
-    final waveWidth = size.width / 2;
-
-    for (int i = 0; i < 3; i++) {
-      double shift = animationValue * size.width * 0.5 * (i + 1);
-      Path path = Path();
-      path.moveTo(-shift, size.height);
-      path.lineTo(-shift, size.height / 2);
-
-      for (double x = -shift; x < size.width + waveWidth; x += waveWidth) {
-        path.quadraticBezierTo(
-          x + waveWidth / 4,
-          size.height / 2 - waveHeight,
-          x + waveWidth / 2,
-          size.height / 2,
-        );
-        path.quadraticBezierTo(
-          x + waveWidth * 3 / 4,
-          size.height / 2 + waveHeight,
-          x + waveWidth,
-          size.height / 2,
-        );
-      }
-
-      path.lineTo(size.width + shift, size.height);
-      path.close();
-
-      canvas.drawPath(path, paint);
-      paint.color = paint.color.withOpacity(0.2);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }

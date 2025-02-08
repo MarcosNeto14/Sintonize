@@ -53,25 +53,21 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1),
+      backgroundColor: Colors.white, // Fundo branco
       body: Column(
         children: [
-          // Barra superior com logo e botão home
+          // Barra superior com logo e botão de voltar
           Container(
-            color: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            color: const Color(0xFFF14621),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 10), // Reduzido o padding vertical
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 80,
-                  height: 80,
-                ),
                 IconButton(
-                  icon: const Icon(Icons.home, color: Colors.white, size: 30),
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 30),
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const TelaInicialScreen(),
@@ -79,19 +75,59 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
                     );
                   },
                 ),
+                const SizedBox(width: 10), // Espaço entre o ícone e o logo
+                Image.asset(
+                  'assets/logo-sintoniza.png',
+                  width: 60, // Reduzido o tamanho do logo
+                  height: 60,
+                ),
               ],
             ),
           ),
           // Barra de pesquisa
-          BarraDePesquisa(
-            controller: _searchController,
-            hintText: 'Pesquise por artista ou música...',
-            onChanged: _filterMusicList,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Pesquise por artista ou música...',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 20,
+                  ),
+                ),
+                onChanged: _filterMusicList,
+              ),
+            ),
           ),
           // Lista de músicas
           Expanded(
             child: _filteredMusicList.isEmpty
-                ? const Center(child: Text('Nenhuma música encontrada.'))
+                ? const Center(
+                    child: Text(
+                      'Nenhuma música encontrada.',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 18,
+                      ),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: _filteredMusicList.length,
                     itemBuilder: (context, index) {
@@ -99,26 +135,48 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
                       return Card(
                         margin: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        color: const Color(0xFFE1E1C1),
-                        child: ListTile(
-                          title: Text(
-                            musicItem['music']!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFF14621),
+                                Color(0xFFFF9E80),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ),
-                          subtitle: Text(musicItem['artist']!),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.arrow_forward,
-                                color: Colors.white),
-                            color: const Color(0xFFF14621),
-                            onPressed: () {
-                              // Implementar ação ao clicar no item
-                            },
-                          ),
-                          tileColor: const Color(0xFFF14621),
-                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.music_note,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                            title: Text(
+                              musicItem['music']!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            subtitle: Text(
+                              musicItem['artist']!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.arrow_forward,
+                                  color: Colors.white),
+                              onPressed: () {
+                                // Implementar ação ao clicar no item
+                              },
+                            ),
                           ),
                         ),
                       );
