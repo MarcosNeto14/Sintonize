@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'tela-inicial.dart'; // Importe a tela inicial para o botão de voltar
 
 class DetalhesPlaylistScreen extends StatefulWidget {
   final String playlistId;

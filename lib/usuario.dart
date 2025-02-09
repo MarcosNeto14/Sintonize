@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sintonize/detalhesplaylist.dart';
 import 'tela-inicial.dart';
-import 'sintonizados.dart';
 import 'main.dart';
 import 'excluir-conta.dart';
 import 'alterar-dados.dart';
@@ -17,6 +16,7 @@ class UsuarioScreen extends StatefulWidget {
 }
 
 class _UsuarioScreenState extends State<UsuarioScreen> {
+  int _selectedIndex = 0;
   String userName = 'Carregando...';
   final User? user = FirebaseAuth.instance.currentUser;
   List<DocumentSnapshot> playlists = [];
@@ -100,39 +100,9 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fundo branco
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Barra superior com logo e botão de voltar
-          Container(
-            color: const Color(0xFFF14621),
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 10), // Reduzido o padding vertical
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Colors.white, size: 30),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TelaInicialScreen(),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10), // Espaço entre o ícone e o logo
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 60, // Reduzido o tamanho do logo
-                  height: 60,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Card de boas-vindas
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Card(
@@ -158,8 +128,18 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.person, color: Colors.white, size: 50),
-                    const SizedBox(width: 10),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TelaInicialScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     Expanded(
                       child: Text(
                         'Bem-vindo(a), $userName!',
@@ -172,19 +152,19 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                         ),
                       ),
                     ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
                   ],
                 ),
               ),
             ),
           ),
           const SizedBox(height: 20),
-          // Lista de opções e playlists
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView(
                 children: [
-                  _buildMenuButton('Criar Playlist', Icons.add, () {
+                  _buildMenuItem('Criar Playlist', Icons.add, () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -245,43 +225,118 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                       ),
                     ),
                   const SizedBox(height: 20),
-                  _buildMenuButton('Sintonizados', Icons.music_note, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SintonizadosScreen()),
-                    );
-                  }),
-                  const SizedBox(height: 15),
-                  _buildMenuButton('Alterar Dados', Icons.edit, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AlterarDadosScreen()),
-                    );
-                  }),
-                  const SizedBox(height: 15),
-                  _buildMenuButton('Sair da Conta', Icons.exit_to_app, () {
-                    FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                    );
-                  }, isExitButton: true),
-                  const SizedBox(height: 15),
-                  _buildMenuButton('Excluir Conta', Icons.delete, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ExcluirContaScreen()),
-                    );
-                  }, isExitButton: true),
                 ],
               ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFFF9E80),
+              Color(0xFFF14621),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+          currentIndex: _selectedIndex,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.edit),
+              label: 'Alterar Dados',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.exit_to_app),
+              label: 'Sair da Conta',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.delete),
+              label: 'Excluir Conta',
+            ),
+          ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
+            } else if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AlterarDadosScreen()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ExcluirContaScreen()),
+              );
+            }
+          },
+          iconSize: 30, // Ajusta o tamanho dos ícones
+          selectedLabelStyle: const TextStyle(
+              fontSize: 12), // Ajusta o tamanho do texto do label
+          unselectedLabelStyle: const TextStyle(
+              fontSize: 12), // Ajusta o tamanho do texto não selecionado
+          elevation: 0, // Remove a sombra da barra inferior
+          type: BottomNavigationBarType.fixed,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(String title, IconData icon, VoidCallback onPressed) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 30, color: const Color(0xFFF14621)),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                fontFamily: 'Piazzolla',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

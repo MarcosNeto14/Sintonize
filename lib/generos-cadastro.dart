@@ -16,12 +16,9 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
     'Pop',
     'Jazz',
     'Blues',
-    'Sertanejo',
     'Hip-Hop',
-    'Eletrônica',
-    'Clássica',
     'Reggae',
-    'MPB'
+    'Country',
   ];
   final Map<String, bool> selecionados = {};
 

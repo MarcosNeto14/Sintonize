@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'usuario.dart';
 import 'perfil-sintonizado.dart';
 import 'tela-inicial.dart'; // Importe a tela inicial para o botão de voltar
 

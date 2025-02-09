@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'tela-inicial.dart';
 
 class CriarPlaylistScreen extends StatefulWidget {
   const CriarPlaylistScreen(

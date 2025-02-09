@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'usuario.dart';
 import 'pesquisa-direta.dart';
-import 'sintonizados.dart'; // Importe a tela Sintonizados
+import 'sintonizados.dart';
+import 'dart:math';
 
 class TelaInicialScreen extends StatefulWidget {
   const TelaInicialScreen({super.key});
@@ -32,29 +33,90 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   }
 
   Future<Map<String, String>> fetchMusica() async {
-    try {
-      final musicas =
-          await FirebaseFirestore.instance.collection('musica').get();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return {'track_name': 'Erro', 'artist_name': 'Usuário não autenticado'};
+    }
 
-      if (musicas.docs.isNotEmpty) {
-        final musica = musicas.docs
-            .first; // Pega a primeira música, mas você pode randomizar aqui
+    try {
+      final userRef =
+          FirebaseFirestore.instance.collection('usuarios').doc(user.uid);
+      final userDoc = await userRef.get();
+
+      // Obtém os gêneros favoritos do usuário
+      final List<dynamic> generosFavoritosRaw =
+          userDoc.data()?['generos_favoritos'] ?? [];
+
+      // Normaliza os gêneros para letras minúsculas
+      final List<String> generosFavoritos =
+          generosFavoritosRaw.map((g) => g.toString().toLowerCase()).toList();
+
+      if (generosFavoritos.isEmpty) {
         return {
-          'track_name': musica['track_name'] ?? 'Sem Título',
-          'artist_name': musica['artist_name'] ?? 'Desconhecido',
+          'track_name': 'Nenhum gênero favorito',
+          'artist_name': 'Selecione gêneros'
         };
       }
 
-      return {
-        'track_name': 'Sem Título',
-        'artist_name': 'Desconhecido',
+      final DateTime now = DateTime.now();
+      final String todayKey = "${now.year}-${now.month}-${now.day}";
+
+      Map<String, dynamic> userHistory =
+          userDoc.data()?['historico_musicas'] ?? {};
+
+      // Se já recomendou uma música hoje, retorna a mesma
+      if (userHistory.containsKey(todayKey)) {
+        final Map<String, dynamic> todayMusic = userHistory[todayKey];
+        return {
+          'track_name': todayMusic['track_name'] as String? ?? 'Sem título',
+          'artist_name': todayMusic['artist_name'] as String? ?? 'Desconhecido'
+        };
+      }
+
+      // Consulta músicas que pertencem aos gêneros favoritos do usuário
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('musica').get();
+
+      // Filtra músicas que pertencem aos gêneros favoritos
+      final availableMusics = querySnapshot.docs.where((doc) {
+        final String genre = doc['genre'].toString().toLowerCase();
+        return generosFavoritos.contains(genre);
+      }).toList();
+
+      if (availableMusics.isEmpty) {
+        return {'track_name': 'Nenhuma música disponível', 'artist_name': ''};
+      }
+
+      final random = Random();
+
+      // Remove músicas já recomendadas anteriormente
+      final filteredMusics = availableMusics
+          .where((doc) => !userHistory.values.any((music) =>
+              music['track_name'] == doc['track_name'] &&
+              music['artist_name'] == doc['artist_name']))
+          .toList();
+
+      if (filteredMusics.isEmpty) {
+        return {
+          'track_name': 'Todas músicas já foram sugeridas',
+          'artist_name': ''
+        };
+      }
+
+      // Escolhe uma música aleatória da lista filtrada
+      final randomMusic = filteredMusics[random.nextInt(filteredMusics.length)];
+      final musicData = {
+        'track_name': randomMusic['track_name'] as String? ?? 'Sem título',
+        'artist_name': randomMusic['artist_name'] as String? ?? 'Desconhecido'
       };
+
+      // Armazena a música do dia no histórico
+      userHistory[todayKey] = musicData;
+      await userRef.update({'historico_musicas': userHistory});
+
+      return musicData;
     } catch (e) {
-      print('Erro ao carregar música: $e');
-      return {
-        'track_name': 'Erro ao carregar música',
-        'artist_name': 'Erro ao carregar artista',
-      };
+      return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
     }
   }
 
@@ -241,17 +303,17 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
           ],
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.transparent, // Cor de fundo transparente
-          selectedItemColor: Colors.white, // Cor do ícone selecionado
-          unselectedItemColor: Colors.white, // Cor dos ícones não selecionados
-          currentIndex: _selectedIndex, // Índice do item selecionado
+          backgroundColor: Colors.transparent,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+          currentIndex: _selectedIndex,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.search),
               label: 'Pesquisa Direta',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.music_note), // Ícone da tela Sintonizados
+              icon: Icon(Icons.music_note),
               label: 'Sintonizados',
             ),
             BottomNavigationBarItem(
@@ -283,12 +345,10 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
               );
             }
           },
-          iconSize: 30, // Ajusta o tamanho dos ícones
-          selectedLabelStyle: const TextStyle(
-              fontSize: 12), // Ajusta o tamanho do texto do label
-          unselectedLabelStyle: const TextStyle(
-              fontSize: 12), // Ajusta o tamanho do texto não selecionado
-          elevation: 0, // Remove a sombra da barra inferior
+          iconSize: 30,
+          selectedLabelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
+          elevation: 0,
           type: BottomNavigationBarType.fixed,
         ),
       ),

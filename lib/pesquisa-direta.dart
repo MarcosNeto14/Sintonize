@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tela-inicial.dart';
-import 'barra_de_pesquisa.dart';
 
 class PesquisaDiretaScreen extends StatefulWidget {
   const PesquisaDiretaScreen({super.key});
