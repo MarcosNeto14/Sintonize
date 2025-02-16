@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white, // Fundo branco para seguir o padrão
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -61,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
               duration: const Duration(seconds: 2),
               child: Image.asset(
                 'assets/logo-sintoniza.png',
-                width: 300,
-                height: 300,
+                width: 150, // Tamanho ajustado para ser consistente
+                height: 150, // Tamanho ajustado para ser consistente
               ),
             ),
             const SizedBox(height: 30),
@@ -71,13 +71,14 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Color(0xFFF14621), // Cor laranja para o texto
+                fontFamily: 'Piazzolla', // Fonte consistente
               ),
             ),
             const SizedBox(height: 50),
             // Botão de Login
             SizedBox(
-              width: 200,
+              width: 250, // Largura ajustada
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
@@ -105,23 +106,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF14621),
+                  backgroundColor: Colors.white, // Fundo branco
+                  foregroundColor: const Color(0xFFF14621), // Texto e ícone laranja
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(15), // Bordas arredondadas
+                    side: const BorderSide(
+                      color: Color(0xFFF14621), // Borda laranja
+                    ),
                   ),
-                  elevation: 10,
-                  shadowColor: Colors.black.withOpacity(0.5),
+                  elevation: 5, // Sombra leve
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.login, color: Colors.white),
+                  children: [
+                    Icon(Icons.login),
                     SizedBox(width: 10),
                     Text(
                       'Login',
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -131,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
             // Botão de Cadastro
             SizedBox(
-              width: 200,
+              width: 250, // Largura ajustada
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
@@ -159,23 +163,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF14621),
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFFF14621),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(15),
+                    side: const BorderSide(
+                      color: Color(0xFFF14621),
+                    ),
                   ),
-                  elevation: 10,
-                  shadowColor: Colors.black.withOpacity(0.5),
+                  elevation: 5,
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.app_registration, color: Colors.white),
+                  children: [
+                    Icon(Icons.app_registration),
                     SizedBox(width: 10),
                     Text(
                       'Cadastro',
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
