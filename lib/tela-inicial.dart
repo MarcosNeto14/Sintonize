@@ -33,7 +33,39 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
     return 'Usuário';
   }
 
-  Future<Map<String, String>> fetchMusica() async {
+  Future<Map<String, String>> fetchLastRecommendedMusic() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return {'track_name': 'Erro', 'artist_name': 'Usuário não autenticado'};
+    }
+
+    try {
+      final userRef =
+          FirebaseFirestore.instance.collection('usuarios').doc(user.uid);
+      final userDoc = await userRef.get();
+
+      // Obtém o histórico de músicas recomendadas
+      final Map<String, dynamic> historicoMusicasRaw =
+          userDoc.data()?['historico_musicas'] ?? {};
+
+      // Pega a última música recomendada (última chave no mapa)
+      if (historicoMusicasRaw.isNotEmpty) {
+        final lastKey = historicoMusicasRaw.keys.last;
+        final lastMusic = historicoMusicasRaw[lastKey];
+        return {
+          'track_name': lastMusic['track_name'] as String? ?? 'Sem título',
+          'artist_name': lastMusic['artist_name'] as String? ?? 'Desconhecido'
+        };
+      }
+
+      // Se não houver histórico, busca uma nova música
+      return await fetchNewMusic();
+    } catch (e) {
+      return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
+    }
+  }
+
+  Future<Map<String, String>> fetchNewMusic() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       return {'track_name': 'Erro', 'artist_name': 'Usuário não autenticado'};
@@ -62,13 +94,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       // Obtém o histórico de músicas recomendadas
       final Map<String, dynamic> historicoMusicasRaw =
           userDoc.data()?['historico_musicas'] ?? {};
-      final List<Map<String, String>> historicoMusicas = historicoMusicasRaw
-          .values
-          .map((music) => {
-                'track_name': music['track_name'] as String,
-                'artist_name': music['artist_name'] as String
-              })
-          .toList();
 
       // Consulta músicas que pertencem aos gêneros favoritos do usuário
       final QuerySnapshot querySnapshot =
@@ -88,7 +113,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
 
       // Remove músicas já recomendadas anteriormente
       final filteredMusics = availableMusics
-          .where((doc) => !historicoMusicas.any((music) =>
+          .where((doc) => !historicoMusicasRaw.values.any((music) =>
               music['track_name'] == doc['track_name'] &&
               music['artist_name'] == doc['artist_name']))
           .toList();
@@ -120,7 +145,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   }
 
   void _fetchNewMusic() async {
-    final newMusic = await fetchMusica();
+    final newMusic = await fetchNewMusic();
     setState(() {
       _currentMusic = newMusic; // Atualiza a música atual
     });
@@ -134,7 +159,14 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchNewMusic(); // Busca uma música ao inicializar a tela
+    _loadLastRecommendedMusic(); // Carrega a última música recomendada ao inicializar
+  }
+
+  void _loadLastRecommendedMusic() async {
+    final lastMusic = await fetchLastRecommendedMusic();
+    setState(() {
+      _currentMusic = lastMusic; // Define a última música recomendada
+    });
   }
 
   @override

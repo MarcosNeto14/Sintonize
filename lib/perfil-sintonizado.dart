@@ -18,42 +18,57 @@ class PerfilSintonizadoScreen extends StatefulWidget {
       _PerfilSintonizadoScreenState();
 }
 
-class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen>
-    with SingleTickerProviderStateMixin {
+class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
   String _musica = 'Carregando...';
   String _artista = 'Carregando...';
   final User? user = FirebaseAuth.instance.currentUser;
-  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 10),
-    )..repeat();
-    _fetchMusica();
+    _fetchMusicaRecomendada();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  // Função para formatar nomes com iniciais maiúsculas
+  String _formatName(String name) {
+    if (name.isEmpty) return name;
+    return name.split(' ').map((word) {
+      if (word.isNotEmpty) {
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }
+      return word;
+    }).join(' ');
   }
 
-  Future<void> _fetchMusica() async {
+  Future<void> _fetchMusicaRecomendada() async {
     try {
-      final musicaSnapshot =
-          await FirebaseFirestore.instance.collection('musica').limit(1).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.userId)
+          .get();
 
-      if (musicaSnapshot.docs.isNotEmpty) {
-        setState(() {
-          _musica = musicaSnapshot.docs.first['track_name'];
-          _artista = musicaSnapshot.docs.first['artist_name'];
-        });
+      if (userDoc.exists) {
+        final historicoMusicas = userDoc.data()?['historico_musicas'] ?? {};
+        if (historicoMusicas.isNotEmpty) {
+          final ultimaMusicaKey = historicoMusicas.keys.last;
+          final ultimaMusica = historicoMusicas[ultimaMusicaKey];
+          setState(() {
+            _musica = _formatName(ultimaMusica['track_name'] ?? 'Sem título');
+            _artista = _formatName(ultimaMusica['artist_name'] ?? 'Desconhecido');
+          });
+        } else {
+          setState(() {
+            _musica = 'Nenhuma música recomendada ainda';
+            _artista = '';
+          });
+        }
       }
     } catch (e) {
-      print("Erro ao carregar música: $e");
+      print("Erro ao carregar música recomendada: $e");
+      setState(() {
+        _musica = 'Erro ao carregar música';
+        _artista = '';
+      });
     }
   }
 
@@ -77,172 +92,180 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      backgroundColor: Colors.white,
+      body: Column(
         children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: DynamicBackgroundPainter(_controller.value),
-                child: SizedBox.expand(),
-              );
-            },
-          ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  Center(
-                    child: Image.asset(
-                      'assets/logo-sintoniza.png',
-                      width: 100,
-                      height: 100,
+          // Cabeçalho com estilo da tela de usuário
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SintonizadosScreen(),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Perfil de ${widget.nome}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const CircleAvatar(
-                    backgroundImage: AssetImage('assets/logo-sintoniza.png'),
-                    radius: 50,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '🎵 $_musica',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    'Artista: $_artista',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  ElevatedButton(
-                    onPressed: () async {
-                      bool confirm = await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Confirmar Exclusão'),
-                            content: const Text(
-                                'Deseja realmente deixar de sintonizar este usuário?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: const Text('Sim'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (confirm == true) {
-                        await _removerSintonizado();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                    Expanded(
+                      child: Text(
+                        'Sintonizado',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'Deixar de Sintonizar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
+                ),
               ),
             ),
           ),
-          Positioned(
-            top: 30,
-            right: 30,
-            child: IconButton(
-              icon: const Icon(Icons.person, color: Colors.black, size: 30),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SintonizadosScreen(),
-                  ),
-                );
-              },
+          // Corpo da tela
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    const CircleAvatar(
+                      backgroundImage: AssetImage('assets/logo-sintoniza.png'),
+                      radius: 50,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Perfil de ${widget.nome}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFF14621),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFFF9E80),
+                              Color(0xFFF14621),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              '🎵 $_musica',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Artista: $_artista',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: () async {
+                        bool confirm = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Confirmar Exclusão'),
+                              content: const Text(
+                                  'Deseja realmente deixar de sintonizar este usuário?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text('Sim'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (confirm == true) {
+                          await _removerSintonizado();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 30),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'Deixar de Sintonizar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
       ),
     );
-  }
-}
-
-class DynamicBackgroundPainter extends CustomPainter {
-  final double animationValue;
-
-  DynamicBackgroundPainter(this.animationValue);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFF14621).withOpacity(0.3)
-      ..style = PaintingStyle.fill;
-
-    final waveHeight = 50;
-    final waveWidth = size.width / 2;
-
-    for (int i = 0; i < 3; i++) {
-      double shift = animationValue * size.width * 0.5 * (i + 1);
-      Path path = Path();
-      path.moveTo(-shift, size.height);
-      path.lineTo(-shift, size.height / 2);
-
-      for (double x = -shift; x < size.width + waveWidth; x += waveWidth) {
-        path.quadraticBezierTo(
-          x + waveWidth / 4,
-          size.height / 2 - waveHeight,
-          x + waveWidth / 2,
-          size.height / 2,
-        );
-        path.quadraticBezierTo(
-          x + waveWidth * 3 / 4,
-          size.height / 2 + waveHeight,
-          x + waveWidth,
-          size.height / 2,
-        );
-      }
-
-      path.lineTo(size.width + shift, size.height);
-      path.close();
-
-      canvas.drawPath(path, paint);
-      paint.color = paint.color.withOpacity(0.2);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }
