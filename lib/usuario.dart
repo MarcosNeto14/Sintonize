@@ -43,14 +43,25 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
 
         if (userDoc.exists) {
           final userData = userDoc.data();
+          if (userData != null && userData.containsKey('nome')) {
+            setState(() {
+              userName = userData['nome'];
+            });
+          } else {
+            setState(() {
+              userName = 'Usuário';
+            });
+          }
+        } else {
           setState(() {
-            userName = userData?['nome'] ?? 'Usuário';
+            userName = 'Usuário não encontrado';
           });
         }
       } catch (e) {
         setState(() {
           userName = 'Erro ao carregar usuário';
         });
+        print("Erro ao carregar nome do usuário: $e");
       }
     } else {
       setState(() {
@@ -361,29 +372,5 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     if (playlistExcluida == true) {
       _fetchPlaylists();
     }
-  }
-
-  Widget _buildMenuButton(String title, IconData icon, VoidCallback onPressed,
-      {bool isExitButton = false}) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isExitButton
-            ? Colors.red
-            : const Color(0xFFF14621), // Cor laranja para botões
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      onPressed: onPressed,
-      icon: Icon(icon, size: 24, color: Colors.white),
-      label: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-        ),
-      ),
-    );
   }
 }

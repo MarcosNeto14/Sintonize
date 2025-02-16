@@ -34,6 +34,8 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
         _allMusicList = musicList;
         _filteredMusicList = List.from(musicList);
       });
+    }).catchError((error) {
+      print("Erro ao carregar músicas: $error");
     });
   }
 
@@ -52,35 +54,63 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fundo branco
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Barra superior com logo e botão de voltar
-          Container(
-            color: const Color(0xFFF14621),
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 10), // Reduzido o padding vertical
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Colors.white, size: 30),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TelaInicialScreen(),
+          // Cabeçalho com estilo da tela de usuário
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TelaInicialScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Buscar Músicas',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
                 ),
-                const SizedBox(width: 10), // Espaço entre o ícone e o logo
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 60, // Reduzido o tamanho do logo
-                  height: 60,
-                ),
-              ],
+              ),
             ),
           ),
           // Barra de pesquisa
@@ -133,49 +163,38 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
                       final musicItem = _filteredMusicList[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        elevation: 0,
+                            vertical: 8, horizontal: 20),
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFFF14621),
-                                Color(0xFFFF9E80),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(15),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.music_note,
+                            color: Color(0xFFF14621),
+                            size: 30,
                           ),
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.music_note,
-                              color: Colors.white,
-                              size: 40,
+                          title: Text(
+                            musicItem['music']!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              fontSize: 16,
                             ),
-                            title: Text(
-                              musicItem['music']!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                          ),
+                          subtitle: Text(
+                            musicItem['artist']!,
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14,
                             ),
-                            subtitle: Text(
-                              musicItem['artist']!,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                              ),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.arrow_forward,
-                                  color: Colors.white),
-                              onPressed: () {
-                                // Implementar ação ao clicar no item
-                              },
-                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.arrow_forward,
+                                color: Color(0xFFF14621)),
+                            onPressed: () {
+                              // Implementar ação ao clicar no item
+                            },
                           ),
                         ),
                       );
