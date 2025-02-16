@@ -15,6 +15,7 @@ class TelaInicialScreen extends StatefulWidget {
 
 class _TelaInicialScreenState extends State<TelaInicialScreen> {
   int _selectedIndex = 0;
+  Map<String, String>? _currentMusic; // Armazena a música atual
 
   Future<String> fetchUserName() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -58,20 +59,16 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
         };
       }
 
-      final DateTime now = DateTime.now();
-      final String todayKey = "${now.year}-${now.month}-${now.day}";
-
-      Map<String, dynamic> userHistory =
+      // Obtém o histórico de músicas recomendadas
+      final Map<String, dynamic> historicoMusicasRaw =
           userDoc.data()?['historico_musicas'] ?? {};
-
-      // Se já recomendou uma música hoje, retorna a mesma
-      if (userHistory.containsKey(todayKey)) {
-        final Map<String, dynamic> todayMusic = userHistory[todayKey];
-        return {
-          'track_name': todayMusic['track_name'] as String? ?? 'Sem título',
-          'artist_name': todayMusic['artist_name'] as String? ?? 'Desconhecido'
-        };
-      }
+      final List<Map<String, String>> historicoMusicas = historicoMusicasRaw
+          .values
+          .map((music) => {
+                'track_name': music['track_name'] as String,
+                'artist_name': music['artist_name'] as String
+              })
+          .toList();
 
       // Consulta músicas que pertencem aos gêneros favoritos do usuário
       final QuerySnapshot querySnapshot =
@@ -91,7 +88,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
 
       // Remove músicas já recomendadas anteriormente
       final filteredMusics = availableMusics
-          .where((doc) => !userHistory.values.any((music) =>
+          .where((doc) => !historicoMusicas.any((music) =>
               music['track_name'] == doc['track_name'] &&
               music['artist_name'] == doc['artist_name']))
           .toList();
@@ -110,14 +107,34 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
         'artist_name': randomMusic['artist_name'] as String? ?? 'Desconhecido'
       };
 
-      // Armazena a música do dia no histórico
-      userHistory[todayKey] = musicData;
-      await userRef.update({'historico_musicas': userHistory});
+      // Atualiza o histórico de músicas recomendadas
+      final DateTime now = DateTime.now();
+      final String todayKey = "${now.year}-${now.month}-${now.day}";
+      historicoMusicasRaw[todayKey] = musicData;
+      await userRef.update({'historico_musicas': historicoMusicasRaw});
 
       return musicData;
     } catch (e) {
       return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
     }
+  }
+
+  void _fetchNewMusic() async {
+    final newMusic = await fetchMusica();
+    setState(() {
+      _currentMusic = newMusic; // Atualiza a música atual
+    });
+  }
+
+  String _formatName(String name) {
+    if (name.isEmpty) return name;
+    return name.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNewMusic(); // Busca uma música ao inicializar a tela
   }
 
   @override
@@ -215,70 +232,54 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
               height: 180,
             ),
             const SizedBox(height: 20),
-            FutureBuilder<Map<String, String>>(
-              future: fetchMusica(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(); // Indicador de carregamento
-                }
-
-                if (snapshot.hasError || !snapshot.hasData) {
-                  return const Text(
-                    'Erro ao carregar música',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontFamily: 'Piazzolla',
-                    ),
-                  );
-                }
-
-                final musica = snapshot.data!;
-                return Card(
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
+            if (_currentMusic != null) // Exibe a música atual se existir
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                  ),
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFFF9E80), // Laranja claro
-                          Color(0xFFF14621), // Laranja escuro
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          musica['track_name']!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontFamily: 'Piazzolla',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          musica['artist_name']!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontFamily: 'Piazzolla',
-                          ),
-                        ),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFF9E80), // Laranja claro
+                        Color(0xFFF14621), // Laranja escuro
                       ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
                   ),
-                );
-              },
-            ),
+                  child: Column(
+                    children: [
+                      Text(
+                        _formatName(_currentMusic!['track_name']!),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontFamily: 'Piazzolla',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        _formatName(_currentMusic!['artist_name']!),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Piazzolla',
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh, color: Colors.white),
+                        onPressed: _fetchNewMusic, // Atualiza a música
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             const Spacer(),
           ],
         ),
