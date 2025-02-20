@@ -5,6 +5,7 @@ import 'usuario.dart';
 import 'pesquisa-direta.dart';
 import 'sintonizados.dart';
 import 'dart:math';
+import 'mapa.dart'; // Importe a tela do mapa que criamos anteriormente
 
 class TelaInicialScreen extends StatefulWidget {
   const TelaInicialScreen({super.key});
@@ -251,6 +252,15 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                             );
                           },
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.map, color: Colors.white),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MapaScreen()),
+                          );
+                        },
                       ),
                     ],
                   ),

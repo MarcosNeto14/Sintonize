@@ -34,5 +34,19 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
-</body>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdAeUxQncwPd_qEBzSZ49RJXRB9wkOM6c"></script>
+  <script>
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -23.55052, lng: -46.633308 },
+        zoom: 10,
+      });
+
+      new google.maps.marker.AdvancedMarkerElement({
+        position: { lat: -23.55052, lng: -46.633308 },
+        map: map
+      });
+    }
+  </script>
+/body>
 </html>
