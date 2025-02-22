@@ -57,11 +57,9 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
           .doc(widget.playlistId);
       await playlistRef.delete();
 
-      // Retorna true para indicar que a playlist foi excluída
       Navigator.pop(context, true);
     } catch (e) {
       print("Erro ao excluir playlist: $e");
-      // Retorna false em caso de erro
       Navigator.pop(context, false);
     }
   }
@@ -69,47 +67,59 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fundo branco
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Barra superior com logo e botão de voltar
-          Container(
-            color: const Color(0xFFF14621),
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 10), // Reduzido o padding vertical
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Colors.white, size: 30),
-                  onPressed: () {
-                    Navigator.pop(context); // Volta para a tela anterior
-                  },
-                ),
-                const SizedBox(width: 10), // Espaço entre o ícone e o logo
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 60, // Reduzido o tamanho do logo
-                  height: 60,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Título da playlist
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              widget.playlistData['nome'] ?? 'Playlist sem nome',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFF14621),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pop(context); // Volta para a tela anterior
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        widget.playlistData['nome'] ?? 'Playlist sem nome',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          // Lista de músicas
           Expanded(
             child: ListView.builder(
               itemCount: _musicas.length,
@@ -140,17 +150,23 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                               'Desconhecido';
                       return Card(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        elevation: 0,
+                            vertical: 8, horizontal: 20),
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
+                          leading: const Icon(
+                            Icons.music_note,
+                            color: Color(0xFFF14621),
+                            size: 30,
+                          ),
                           title: Text(
                             '$musica - $artistName',
                             style: const TextStyle(
-                              color: Colors.black87,
                               fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              fontSize: 16,
                             ),
                           ),
                           trailing: IconButton(
@@ -189,8 +205,8 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                     } else {
                       return Card(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        elevation: 0,
+                            vertical: 8, horizontal: 20),
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -207,10 +223,8 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
               },
             ),
           ),
-          const SizedBox(height: 20),
-          // Botão de excluir playlist
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: ElevatedButton(
               onPressed: _deletePlaylist,
               style: ElevatedButton.styleFrom(
@@ -230,7 +244,6 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
         ],
       ),
     );

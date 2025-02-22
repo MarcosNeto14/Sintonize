@@ -47,9 +47,9 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
     try {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('usuarios').get();
-
+      List<DocumentSnapshot> allUsers = snapshot.docs.where((doc) => doc.id != user!.uid).toList();
       setState(() {
-        _allUsers = snapshot.docs;
+        _allUsers = allUsers;
       });
     } catch (e) {
       print("Erro ao carregar usuários: $e");

@@ -141,32 +141,60 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fundo branco
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Barra superior com logo e botão de voltar
-          Container(
-            color: const Color(0xFFF14621),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Colors.white, size: 30),
-                  onPressed: () {
-                    Navigator.pop(context); // Volta para a tela anterior
-                  },
+          // Cabeçalho com estilo da tela de pesquisa direta
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
                 ),
-                const SizedBox(width: 10), // Espaço entre o ícone e o logo
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 60, // Reduzido o tamanho do logo
-                  height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-              ],
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pop(context); // Volta para a tela anterior
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Alterando Dados',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
           // Formulário de alteração de dados
           Expanded(
             child: SingleChildScrollView(
@@ -236,23 +264,37 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
           ),
         ),
         const SizedBox(height: 5),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          style: const TextStyle(color: Colors.black),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.grey),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.grey),
-            ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          validator: validator,
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 20,
+              ),
+            ),
+            validator: validator,
+          ),
         ),
       ],
     );
