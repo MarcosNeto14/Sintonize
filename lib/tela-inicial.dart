@@ -5,7 +5,7 @@ import 'usuario.dart';
 import 'pesquisa-direta.dart';
 import 'sintonizados.dart';
 import 'dart:math';
-import 'mapa.dart'; // Importe a tela do mapa que criamos anteriormente
+import 'mapa.dart';
 
 class TelaInicialScreen extends StatefulWidget {
   const TelaInicialScreen({super.key});
@@ -44,12 +44,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       final userRef =
           FirebaseFirestore.instance.collection('usuarios').doc(user.uid);
       final userDoc = await userRef.get();
-
-      // Obtém o histórico de músicas recomendadas
       final Map<String, dynamic> historicoMusicasRaw =
           userDoc.data()?['historico_musicas'] ?? {};
-
-      // Pega a última música recomendada (última chave no mapa)
       if (historicoMusicasRaw.isNotEmpty) {
         final lastKey = historicoMusicasRaw.keys.last;
         final lastMusic = historicoMusicasRaw[lastKey];
@@ -58,8 +54,6 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
           'artist_name': lastMusic['artist_name'] as String? ?? 'Desconhecido'
         };
       }
-
-      // Se não houver histórico, busca uma nova música
       return await fetchNewMusic();
     } catch (e) {
       return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
@@ -71,17 +65,12 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
     if (user == null) {
       return {'track_name': 'Erro', 'artist_name': 'Usuário não autenticado'};
     }
-
     try {
       final userRef =
           FirebaseFirestore.instance.collection('usuarios').doc(user.uid);
       final userDoc = await userRef.get();
-
-      // Obtém os gêneros favoritos do usuário
       final List<dynamic> generosFavoritosRaw =
           userDoc.data()?['generos_favoritos'] ?? [];
-
-      // Normaliza os gêneros para letras minúsculas
       final List<String> generosFavoritos =
           generosFavoritosRaw.map((g) => g.toString().toLowerCase()).toList();
 
@@ -91,16 +80,10 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
           'artist_name': 'Selecione gêneros'
         };
       }
-
-      // Obtém o histórico de músicas recomendadas
       final Map<String, dynamic> historicoMusicasRaw =
           userDoc.data()?['historico_musicas'] ?? {};
-
-      // Consulta músicas que pertencem aos gêneros favoritos do usuário
       final QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('musica').get();
-
-      // Filtra músicas que pertencem aos gêneros favoritos
       final availableMusics = querySnapshot.docs.where((doc) {
         final String genre = doc['genre'].toString().toLowerCase();
         return generosFavoritos.contains(genre);
@@ -109,36 +92,27 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       if (availableMusics.isEmpty) {
         return {'track_name': 'Nenhuma música disponível', 'artist_name': ''};
       }
-
       final random = Random();
-
-      // Remove músicas já recomendadas anteriormente
       final filteredMusics = availableMusics
           .where((doc) => !historicoMusicasRaw.values.any((music) =>
               music['track_name'] == doc['track_name'] &&
               music['artist_name'] == doc['artist_name']))
           .toList();
-
       if (filteredMusics.isEmpty) {
         return {
           'track_name': 'Todas músicas já foram sugeridas',
           'artist_name': ''
         };
       }
-
-      // Escolhe uma música aleatória da lista filtrada
       final randomMusic = filteredMusics[random.nextInt(filteredMusics.length)];
       final musicData = {
         'track_name': randomMusic['track_name'] as String? ?? 'Sem título',
         'artist_name': randomMusic['artist_name'] as String? ?? 'Desconhecido'
       };
-
-      // Atualiza o histórico de músicas recomendadas
       final DateTime now = DateTime.now();
       final String todayKey = "${now.year}-${now.month}-${now.day}";
       historicoMusicasRaw[todayKey] = musicData;
       await userRef.update({'historico_musicas': historicoMusicasRaw});
-
       return musicData;
     } catch (e) {
       return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
@@ -148,7 +122,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   void _fetchNewMusic() async {
     final newMusic = await fetchNewMusic();
     setState(() {
-      _currentMusic = newMusic; // Atualiza a música atual
+      _currentMusic = newMusic;
     });
   }
 
@@ -160,13 +134,13 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   @override
   void initState() {
     super.initState();
-    _loadLastRecommendedMusic(); // Carrega a última música recomendada ao inicializar
+    _loadLastRecommendedMusic();
   }
 
   void _loadLastRecommendedMusic() async {
     final lastMusic = await fetchLastRecommendedMusic();
     setState(() {
-      _currentMusic = lastMusic; // Define a última música recomendada
+      _currentMusic = lastMusic;
     });
   }
 
@@ -274,7 +248,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
               height: 180,
             ),
             const SizedBox(height: 20),
-            if (_currentMusic != null) // Exibe a música atual se existir
+            if (_currentMusic != null)
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(
@@ -287,8 +261,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                     borderRadius: BorderRadius.circular(20),
                     gradient: const LinearGradient(
                       colors: [
-                        Color(0xFFFF9E80), // Laranja claro
-                        Color(0xFFF14621), // Laranja escuro
+                        Color(0xFFFF9E80),
+                        Color(0xFFF14621),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -316,7 +290,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.refresh, color: Colors.white),
-                        onPressed: _fetchNewMusic, // Atualiza a música
+                        onPressed: _fetchNewMusic,
                       ),
                     ],
                   ),

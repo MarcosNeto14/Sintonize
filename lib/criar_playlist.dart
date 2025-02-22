@@ -48,6 +48,11 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
     });
   }
 
+  String _formatName(String name) {
+    if (name.isEmpty) return name;
+    return name.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,9 +155,8 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                       itemCount: _musicasFiltradas.length,
                       itemBuilder: (context, index) {
                         var musica = _musicasFiltradas[index];
-                        String musicaNome = musica['track_name'];
-                        String artistName =
-                            musica['artist_name'] ?? 'Desconhecido';
+                        String musicaNome = _formatName(musica['track_name']);
+                        String artistName = _formatName(musica['artist_name'] ?? 'Desconhecido');
 
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 5),
@@ -164,18 +168,17 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                             title: Text('$musicaNome - $artistName'),
                             trailing: IconButton(
                               icon: Icon(
-                                _musicasSelecionadas.contains(musicaNome)
+                                _musicasSelecionadas.contains(musica['track_name'])
                                     ? Icons.check_box
                                     : Icons.check_box_outline_blank,
                                 color: const Color(0xFFF14621),
                               ),
                               onPressed: () {
                                 setState(() {
-                                  if (_musicasSelecionadas
-                                      .contains(musicaNome)) {
-                                    _musicasSelecionadas.remove(musicaNome);
+                                  if (_musicasSelecionadas.contains(musica['track_name'])) {
+                                    _musicasSelecionadas.remove(musica['track_name']);
                                   } else {
-                                    _musicasSelecionadas.add(musicaNome);
+                                    _musicasSelecionadas.add(musica['track_name']);
                                   }
                                 });
                               },
