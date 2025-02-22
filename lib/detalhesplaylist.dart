@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'adicionar-musica.dart';
 
 class DetalhesPlaylistScreen extends StatefulWidget {
   final String playlistId;
@@ -19,11 +20,22 @@ class DetalhesPlaylistScreen extends StatefulWidget {
 
 class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
   late List<String> _musicas;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _musicas = List.from(widget.musicas);
+    _searchController.addListener(_filterMusicas);
+  }
+
+  void _filterMusicas() {
+    setState(() {
+      // Filtra as músicas com base no texto da pesquisa
+      _musicas = widget.musicas.where((musica) {
+        return musica.toLowerCase().contains(_searchController.text.toLowerCase());
+      }).toList();
+    });
   }
 
   Future<void> _deleteSongFromPlaylist(String song) async {
@@ -31,20 +43,12 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
       final playlistRef = FirebaseFirestore.instance
           .collection('playlists')
           .doc(widget.playlistId);
-      final playlistDoc = await playlistRef.get();
-
-      if (playlistDoc.exists) {
-        List<dynamic> musicas = playlistDoc['musicas'] ?? [];
-        musicas.remove(song);
-
-        await playlistRef.update({
-          'musicas': musicas,
-        });
-
-        setState(() {
-          _musicas.remove(song);
-        });
-      }
+      await playlistRef.update({
+        'musicas': FieldValue.arrayRemove([song]),
+      });
+      setState(() {
+        _musicas.remove(song);
+      });
     } catch (e) {
       print("Erro ao excluir música: $e");
     }
@@ -62,6 +66,11 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
       print("Erro ao excluir playlist: $e");
       Navigator.pop(context, false);
     }
+  }
+
+  String _formatName(String name) {
+    if (name.isEmpty) return name;
+    return name.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
   }
 
   @override
@@ -99,7 +108,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                       icon: const Icon(Icons.arrow_back,
                           color: Colors.white, size: 30),
                       onPressed: () {
-                        Navigator.pop(context); // Volta para a tela anterior
+                        Navigator.pop(context, true);
                       },
                     ),
                     Expanded(
@@ -114,8 +123,40 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.person, color: Colors.white, size: 50),
+                    IconButton(
+                      icon: const Icon(Icons.add, color: Colors.white, size: 30),
+                      onPressed: () async {
+                        final newSongs = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdicionarMusicaScreen(
+                              playlistId: widget.playlistId,
+                              currentSongs: _musicas,
+                            ),
+                          ),
+                        );
+
+                        if (newSongs != null) {
+                          setState(() {
+                            _musicas.addAll(newSongs);
+                          });
+                        }
+                      },
+                    ),
                   ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar música',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
@@ -162,7 +203,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                             size: 30,
                           ),
                           title: Text(
-                            '$musica - $artistName',
+                            '${_formatName(musica)} - ${_formatName(artistName)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -172,32 +213,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
-                              bool confirm = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmar Exclusão'),
-                                    content: Text(
-                                        'Deseja excluir a música $musica da playlist?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        child: const Text('Excluir'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-
-                              if (confirm == true) {
-                                await _deleteSongFromPlaylist(musica);
-                              }
+                              await _deleteSongFromPlaylist(musica);
                             },
                           ),
                         ),
@@ -212,7 +228,7 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
                         ),
                         child: ListTile(
                           title: Text(
-                            '$musica - Artista não encontrado',
+                            '${_formatName(musica)} - Artista não encontrado',
                             style: const TextStyle(color: Colors.black87),
                           ),
                         ),

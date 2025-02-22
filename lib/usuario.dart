@@ -304,12 +304,12 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
               );
             }
           },
-          iconSize: 30, // Ajusta o tamanho dos ícones
+          iconSize: 30,
           selectedLabelStyle: const TextStyle(
-              fontSize: 12), // Ajusta o tamanho do texto do label
+              fontSize: 12),
           unselectedLabelStyle: const TextStyle(
-              fontSize: 12), // Ajusta o tamanho do texto não selecionado
-          elevation: 0, // Remove a sombra da barra inferior
+              fontSize: 12),
+          elevation: 0,
           type: BottomNavigationBarType.fixed,
         ),
       ),
@@ -355,9 +355,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
   void _showPlaylistDetails(BuildContext context, String playlistId,
       Map<String, dynamic> playlistData, List<dynamic> musicas) async {
     final List<String> musicasList = List<String>.from(musicas);
-
-    // Aguarda o retorno da tela de detalhes da playlist
-    final playlistExcluida = await Navigator.push(
+    final playlistAlterada = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DetalhesPlaylistScreen(
@@ -367,9 +365,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         ),
       ),
     );
-
-    // Se a playlist foi excluída, recarrega a lista de playlists
-    if (playlistExcluida == true) {
+    if (playlistAlterada == true) {
       _fetchPlaylists();
     }
   }
