@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'main.dart'; // Sua tela inicial
-import 'usuario.dart'; // Tela do usuário
+import 'main.dart';
+import 'usuario.dart';
 
 class ExcluirContaScreen extends StatefulWidget {
   const ExcluirContaScreen({super.key});
@@ -16,33 +16,22 @@ class _ExcluirContaScreenState extends State<ExcluirContaScreen> {
 
   Future<void> _excluirConta() async {
     try {
-      // Recupera o usuário atual
       User? user = _auth.currentUser;
-
       if (user == null) {
         _mostrarMensagem("Nenhum usuário logado.");
         return;
       }
-
       String senha = _senhaController.text;
-
-      // Verifique se a senha está correta
-      // O Firebase Auth não permite verificar diretamente a senha, então vamos reautenticar o usuário
       AuthCredential credential = EmailAuthProvider.credential(
         email: user.email!,
         password: senha,
       );
 
       try {
-        // Reautentica o usuário com a senha fornecida
         await user.reauthenticateWithCredential(credential);
-
-        // Se a senha estiver correta, exclui a conta
         await user.delete();
-
         _mostrarMensagem(
             'Conta excluída com sucesso, retornando para a tela inicial');
-
         Future.delayed(const Duration(seconds: 3), () {
           Navigator.pushReplacement(
             context,
@@ -61,7 +50,6 @@ class _ExcluirContaScreenState extends State<ExcluirContaScreen> {
     }
   }
 
-  // Função para exibir uma mensagem de SnackBar
   void _mostrarMensagem(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -74,45 +62,61 @@ class _ExcluirContaScreenState extends State<ExcluirContaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1E1C1),
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            color: Colors.black,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset(
-                  'assets/logo-sintoniza.png',
-                  width: 70,
-                  height: 70,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
                 ),
-                const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Excluir Conta',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.home, color: Colors.white),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UsuarioScreen()),
-                    );
-                  },
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UsuarioScreen()),
+                        );
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Excluir Conta',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 40),
@@ -130,17 +134,31 @@ class _ExcluirContaScreenState extends State<ExcluirContaScreen> {
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              controller: _senhaController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Senha',
-                labelStyle: const TextStyle(color: Colors.black),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.black),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _senhaController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Digite sua senha',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                  prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 20,
+                  ),
                 ),
               ),
             ),
