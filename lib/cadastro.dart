@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login.dart';
 import 'generos-cadastro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -28,10 +30,67 @@ class _CadastroScreenState extends State<CadastroScreen> {
   String? _estadoSelecionado;
 
   final List<String> _estados = [
-    "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", 
-    "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    "AC",
+    "AL",
+    "AP",
+    "AM",
+    "BA",
+    "CE",
+    "DF",
+    "ES",
+    "GO",
+    "MA",
+    "MT",
+    "MS",
+    "MG",
+    "PA",
+    "PB",
+    "PR",
+    "PE",
+    "PI",
+    "RJ",
+    "RN",
+    "RS",
+    "RO",
+    "RR",
+    "SC",
+    "SP",
+    "SE",
+    "TO"
   ];
 
+  // Função para buscar o endereço a partir do CEP
+  Future<void> _fetchAddressFromCEP(String cep) async {
+    final url = Uri.parse('https://viacep.com.br/ws/$cep/json/');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['erro'] == null) {
+          setState(() {
+            _ruaController.text = data['logradouro'];
+            _bairroController.text = data['bairro'];
+            _cidadeController.text = data['localidade'];
+            _estadoSelecionado = data['uf'];
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('CEP não encontrado')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erro ao buscar CEP')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
+    }
+  }
+
+  // Validação de data de nascimento
   String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
       return 'A data de nascimento é obrigatória';
@@ -60,6 +119,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
+  // Validação de e-mail
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'O e-mail é obrigatório';
@@ -72,6 +132,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
+  // Validação de CEP
   String? _validateCEP(String? value) {
     if (value == null || value.isEmpty) {
       return 'O CEP é obrigatório';
@@ -82,6 +143,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
+  // Validação de número
   String? _validateNumero(String? value) {
     if (value == null || value.isEmpty) {
       return 'O número é obrigatório';
@@ -92,6 +154,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
+  // Submissão do formulário
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -182,7 +245,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: _buildTextField('Nome', _nomeController, (value) {
+                                child: _buildTextField('Nome', _nomeController,
+                                    (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'O nome é obrigatório';
                                   }
@@ -203,11 +267,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(8),
-                                    TextInputFormatter.withFunction((oldValue, newValue) {
+                                    TextInputFormatter.withFunction(
+                                        (oldValue, newValue) {
                                       if (newValue.text.isEmpty) {
                                         return TextEditingValue.empty;
                                       }
-                                      final text = newValue.text.replaceAll('/', '');
+                                      final text =
+                                          newValue.text.replaceAll('/', '');
                                       String newText = '';
                                       for (var i = 0; i < text.length; i++) {
                                         if (i == 2 || i == 4) {
@@ -228,13 +294,15 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                           const SizedBox(height: 15),
                           // E-mail (largura total)
-                          _buildTextField('E-mail', _emailController, _validateEmail),
+                          _buildTextField(
+                              'E-mail', _emailController, _validateEmail),
                           const SizedBox(height: 15),
                           // Senha e Confirmar Senha lado a lado
                           Row(
                             children: [
                               Expanded(
-                                child: _buildTextField('Senha', _senhaController, (value) {
+                                child: _buildTextField(
+                                    'Senha', _senhaController, (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'A senha é obrigatória';
                                   }
@@ -246,7 +314,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: _buildTextField('Confirmar Senha', _confSenhaController, (value) {
+                                child: _buildTextField(
+                                    'Confirmar Senha', _confSenhaController,
+                                    (value) {
                                   if (value != _senhaController.text) {
                                     return 'As senhas não coincidem';
                                   }
@@ -256,15 +326,25 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ],
                           ),
                           const SizedBox(height: 15),
+                          // CEP (primeiro campo de endereço)
+                          _buildTextField('CEP', _cepController, _validateCEP,
+                              onChanged: (value) {
+                            if (value != null && value.length == 9) {
+                              _fetchAddressFromCEP(value.replaceAll('-', ''));
+                            }
+                          }),
+                          const SizedBox(height: 15),
                           // Rua e Número lado a lado
                           Row(
                             children: [
                               Expanded(
-                                child: _buildTextField('Rua', _ruaController, null),
+                                child: _buildTextField(
+                                    'Rua', _ruaController, null),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: _buildTextField('Número', _numeroController, _validateNumero),
+                                child: _buildTextField('Número',
+                                    _numeroController, _validateNumero),
                               ),
                             ],
                           ),
@@ -273,27 +353,19 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: _buildTextField('Bairro', _bairroController, null),
+                                child: _buildTextField(
+                                    'Bairro', _bairroController, null),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: _buildTextField('Cidade', _cidadeController, null),
+                                child: _buildTextField(
+                                    'Cidade', _cidadeController, null),
                               ),
                             ],
                           ),
                           const SizedBox(height: 15),
-                          // Estado e CEP lado a lado
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildEstadoDropdown(),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _buildTextField('CEP', _cepController, _validateCEP),
-                              ),
-                            ],
-                          ),
+                          // Estado
+                          _buildEstadoDropdown(),
                           const SizedBox(height: 20),
                           // Botão de Cadastrar
                           SizedBox(
@@ -350,7 +422,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   Widget _buildTextField(String label, TextEditingController controller,
       String? Function(String?)? validator,
-      {bool obscureText = false, List<TextInputFormatter>? inputFormatters}) {
+      {bool obscureText = false,
+      List<TextInputFormatter>? inputFormatters,
+      void Function(String)? onChanged}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -370,10 +444,12 @@ class _CadastroScreenState extends State<CadastroScreen> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           ),
           validator: validator,
           inputFormatters: inputFormatters,
+          onChanged: onChanged,
         ),
       ],
     );
@@ -410,7 +486,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           ),
         ),
       ],

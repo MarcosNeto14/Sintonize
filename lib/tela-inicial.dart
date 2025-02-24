@@ -80,6 +80,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
           'artist_name': 'Selecione gêneros'
         };
       }
+
       final Map<String, dynamic> historicoMusicasRaw =
           userDoc.data()?['historico_musicas'] ?? {};
       final QuerySnapshot querySnapshot =
@@ -92,27 +93,37 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       if (availableMusics.isEmpty) {
         return {'track_name': 'Nenhuma música disponível', 'artist_name': ''};
       }
+
       final random = Random();
       final filteredMusics = availableMusics
           .where((doc) => !historicoMusicasRaw.values.any((music) =>
               music['track_name'] == doc['track_name'] &&
               music['artist_name'] == doc['artist_name']))
           .toList();
+
       if (filteredMusics.isEmpty) {
         return {
           'track_name': 'Todas músicas já foram sugeridas',
           'artist_name': ''
         };
       }
+
       final randomMusic = filteredMusics[random.nextInt(filteredMusics.length)];
       final musicData = {
         'track_name': randomMusic['track_name'] as String? ?? 'Sem título',
         'artist_name': randomMusic['artist_name'] as String? ?? 'Desconhecido'
       };
+
       final DateTime now = DateTime.now();
       final String todayKey = "${now.year}-${now.month}-${now.day}";
       historicoMusicasRaw[todayKey] = musicData;
-      await userRef.update({'historico_musicas': historicoMusicasRaw});
+
+      // Atualize o Firestore com a música recomendada
+      await userRef.update({
+        'historico_musicas': historicoMusicasRaw,
+        'musica_recomendada': musicData, // Adicione esta linha
+      });
+
       return musicData;
     } catch (e) {
       return {'track_name': 'Erro ao carregar música', 'artist_name': 'Erro'};
@@ -128,7 +139,10 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
 
   String _formatName(String name) {
     if (name.isEmpty) return name;
-    return name.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+    return name
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 
   @override
@@ -232,7 +246,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const MapaScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => const MapaScreen()),
                           );
                         },
                       ),
