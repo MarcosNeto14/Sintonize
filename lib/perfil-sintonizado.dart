@@ -247,10 +247,10 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
                             label: Text(
                               genero,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.deepOrange,
                               ),
                             ),
-                            backgroundColor: const Color(0xFFF14621),
+                            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                           );
                         }).toList(),
                       ),
