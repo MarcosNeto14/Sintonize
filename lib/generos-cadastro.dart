@@ -78,10 +78,9 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Align(
-                alignment: Alignment.topLeft,
+              Center(
                 child: Image.asset(
                   'assets/logo-sintoniza.png',
                   width: 100,
