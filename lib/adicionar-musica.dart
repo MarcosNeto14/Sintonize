@@ -109,6 +109,7 @@ class _AdicionarMusicaScreenState extends State<AdicionarMusicaScreen> {
                         ),
                       ),
                     ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
                   ],
                 ),
               ),
