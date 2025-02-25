@@ -16,9 +16,6 @@ class _MapaScreenState extends State<MapaScreen> {
   late GoogleMapController mapController;
   LatLng? _userLocation;
   Set<Marker> _markers = {};
-  bool _showMusicBox = false;
-  List<String> _musicasDaCidade = [];
-  String _cidadeSelecionada = '';
 
   @override
   void initState() {

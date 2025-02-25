@@ -229,7 +229,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: _buildTextField(
-                                  'Data de Nascimento (dd/mm/aaaa)',
+                                  'Data de Nascimento',
                                   _dataNascController,
                                   _validateDate,
                                   inputFormatters: [

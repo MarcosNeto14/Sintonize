@@ -50,7 +50,7 @@ class MusicasCidadeScreen extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        'Músicas em $cidade',
+                        'Músicas recomendadas em $cidade',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -60,6 +60,7 @@ class MusicasCidadeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
                   ],
                 ),
               ),
