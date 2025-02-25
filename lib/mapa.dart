@@ -270,7 +270,7 @@ class _MapaScreenState extends State<MapaScreen> {
                           ),
                         ),
                         constraints: const BoxConstraints(
-                          maxHeight: 150,
+                          maxHeight: 200,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
