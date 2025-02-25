@@ -280,7 +280,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
               label: 'Excluir Conta',
             ),
           ],
-          onTap: (index) {
+          onTap: (index) async {
             setState(() {
               _selectedIndex = index;
             });
@@ -291,11 +291,14 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                 MaterialPageRoute(builder: (context) => const HomeScreen()),
               );
             } else if (index == 0) {
-              Navigator.push(
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => const AlterarDadosScreen()),
               );
+              if (result == true) {
+                _fetchUserName();
+              }
             } else if (index == 2) {
               Navigator.push(
                 context,
@@ -305,10 +308,8 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
             }
           },
           iconSize: 30,
-          selectedLabelStyle: const TextStyle(
-              fontSize: 12),
-          unselectedLabelStyle: const TextStyle(
-              fontSize: 12),
+          selectedLabelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
           elevation: 0,
           type: BottomNavigationBarType.fixed,
         ),

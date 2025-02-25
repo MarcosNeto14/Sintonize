@@ -20,23 +20,33 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
     _fetchMusic();
   }
 
-  // Função para buscar músicas do Firestore
   void _fetchMusic() async {
-    FirebaseFirestore.instance.collection('musica').get().then((snapshot) {
-      List<Map<String, String>> musicList = snapshot.docs.map((doc) {
-        return {
-          'music': (doc['track_name'] ?? 'Desconhecido').toString(),
-          'artist': (doc['artist_name'] ?? 'Desconhecido').toString(),
-        };
-      }).toList();
+  FirebaseFirestore.instance.collection('musica').get().then((snapshot) {
+    List<Map<String, String>> musicList = snapshot.docs.map((doc) {
+      return {
+        'music': _formatName((doc['track_name'] ?? 'Desconhecido').toString()),
+        'artist': _formatName((doc['artist_name'] ?? 'Desconhecido').toString()),
+      };
+    }).toList();
 
-      setState(() {
-        _allMusicList = musicList;
-        _filteredMusicList = List.from(musicList);
-      });
-    }).catchError((error) {
-      print("Erro ao carregar músicas: $error");
+    setState(() {
+      _allMusicList = musicList;
+      _filteredMusicList = List.from(musicList);
     });
+  }).catchError((error) {
+    print("Erro ao carregar músicas: $error");
+  });
+}
+
+  // Função para formatar nomes com iniciais maiúsculas
+  String _formatName(String name) {
+    if (name.isEmpty) return name;
+    return name.split(' ').map((word) {
+      if (word.isNotEmpty) {
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }
+      return word;
+    }).join(' ');
   }
 
   // Função para filtrar as músicas conforme o usuário digita
@@ -145,7 +155,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
               ),
             ),
           ),
-          // Lista de músicas
           Expanded(
             child: _filteredMusicList.isEmpty
                 ? const Center(
@@ -188,13 +197,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
                               color: Colors.black54,
                               fontSize: 14,
                             ),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.arrow_forward,
-                                color: Color(0xFFF14621)),
-                            onPressed: () {
-                              // Implementar ação ao clicar no item
-                            },
                           ),
                         ),
                       );

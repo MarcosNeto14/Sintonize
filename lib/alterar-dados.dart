@@ -102,7 +102,7 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dados atualizados com sucesso!')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, true); // Retorna true para indicar que houve alteração
     } on FirebaseAuthException catch (e) {
       String message;
       switch (e.code) {
