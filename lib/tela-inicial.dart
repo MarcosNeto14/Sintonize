@@ -18,6 +18,11 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
   int _selectedIndex = 0;
   Map<String, String>? _currentMusic;
 
+  // Função para normalizar gêneros
+  String _normalizeGenre(String genre) {
+    return genre.toLowerCase().replaceAll('-', '').replaceAll(' ', '');
+  }
+
   Future<String> fetchUserName() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -71,8 +76,9 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       final userDoc = await userRef.get();
       final List<dynamic> generosFavoritosRaw =
           userDoc.data()?['generos_favoritos'] ?? [];
-      final List<String> generosFavoritos =
-          generosFavoritosRaw.map((g) => g.toString().toLowerCase()).toList();
+      final List<String> generosFavoritos = generosFavoritosRaw
+          .map((g) => _normalizeGenre(g.toString()))
+          .toList();
 
       if (generosFavoritos.isEmpty) {
         return {
@@ -86,7 +92,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       final QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('musica').get();
       final availableMusics = querySnapshot.docs.where((doc) {
-        final String genre = doc['genre'].toString().toLowerCase();
+        final String genre = _normalizeGenre(doc['genre'].toString());
         return generosFavoritos.contains(genre);
       }).toList();
 
