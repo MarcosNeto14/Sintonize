@@ -72,23 +72,6 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
     }
   }
 
-  Future<void> _removerSintonizado() async {
-    if (user != null) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('usuarios')
-            .doc(user!.uid)
-            .collection('sintonizados')
-            .doc(widget.userId)
-            .delete();
-
-        Navigator.pop(context);
-      } catch (e) {
-        print("Erro ao remover sintonizado: $e");
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,9 +142,10 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    const CircleAvatar(
-                      backgroundImage: AssetImage('assets/logo-sintoniza.png'),
-                      radius: 50,
+                    Image.asset(
+                      'assets/logo-sintoniza.png',
+                      height: 100,
+                      width: 100,
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -211,51 +195,6 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                      onPressed: () async {
-                        bool confirm = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Confirmar Exclusão'),
-                              content: const Text(
-                                  'Deseja realmente deixar de sintonizar este usuário?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Sim'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-
-                        if (confirm == true) {
-                          await _removerSintonizado();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 30),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        'Deixar de Sintonizar',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

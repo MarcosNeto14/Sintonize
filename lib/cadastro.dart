@@ -333,7 +333,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                 LengthLimitingTextInputFormatter(8),
                                 _CEPInputFormatter(), // Formatador personalizado
                               ], onChanged: (value) {
-                            if (value != null && value.length == 9) {
+                            if (value.length == 9) {
                               _fetchAddressFromCEP(value.replaceAll('-', ''));
                             }
                           }),

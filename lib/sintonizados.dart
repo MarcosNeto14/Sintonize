@@ -242,10 +242,10 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/logo-sintoniza.png'),
-                            radius: 25,
+                          leading: Image.asset(
+                            'assets/logo-sintoniza.png',
+                            width: 50,
+                            height: 50,
                           ),
                           title: Text(
                             user['nome'],
@@ -301,10 +301,10 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/logo-sintoniza.png'),
-                            radius: 25,
+                          leading: Image.asset(
+                            'assets/logo-sintoniza.png',
+                            width: 50,
+                            height: 50,
                           ),
                           title: Text(
                             user['nome'],

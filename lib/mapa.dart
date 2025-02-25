@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_maps_webservice/geocoding.dart'; // Importe o pacote
+import 'package:google_maps_webservice/geocoding.dart';
 
 class MapaScreen extends StatefulWidget {
   const MapaScreen({super.key});
@@ -15,6 +15,9 @@ class _MapaScreenState extends State<MapaScreen> {
   late GoogleMapController mapController;
   LatLng? _userLocation;
   Set<Marker> _markers = {};
+  bool _showMusicBox = false;
+  List<String> _musicasDaCidade = [];
+  String _cidadeSelecionada = '';
 
   @override
   void initState() {
@@ -23,7 +26,6 @@ class _MapaScreenState extends State<MapaScreen> {
     _fetchUsersLocationsAndMusic();
   }
 
-  // Busca a localização do usuário atual
   Future<void> _fetchUserLocation() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -54,19 +56,15 @@ class _MapaScreenState extends State<MapaScreen> {
     }
   }
 
-  // Busca as localizações e músicas recomendadas de todos os usuários
   Future<void> _fetchUsersLocationsAndMusic() async {
     try {
       final usersSnapshot =
           await FirebaseFirestore.instance.collection('usuarios').get();
-
-      // Agrupa músicas por cidade
       final Map<String, List<String>> musicasPorCidade = {};
 
       for (var doc in usersSnapshot.docs) {
         final endereco = doc.data()['endereco'];
         final cidade = endereco['cidade'];
-        final estado = endereco['estado'];
         final musicaRecomendada = doc.data()['musica_recomendada'];
 
         if (musicaRecomendada != null) {
@@ -79,8 +77,6 @@ class _MapaScreenState extends State<MapaScreen> {
           }
         }
       }
-
-      // Cria marcadores para cada cidade
       for (var cidade in musicasPorCidade.keys) {
         final endereco = usersSnapshot.docs.firstWhere(
           (doc) => doc.data()['endereco']['cidade'] == cidade,
@@ -96,8 +92,11 @@ class _MapaScreenState extends State<MapaScreen> {
                 markerId: MarkerId(cidade),
                 position: location,
                 onTap: () {
-                  _mostrarMusicasPopUp(
-                      context, cidade, musicasPorCidade[cidade]!);
+                  setState(() {
+                    _showMusicBox = true;
+                    _musicasDaCidade = musicasPorCidade[cidade]!;
+                    _cidadeSelecionada = cidade;
+                  });
                 },
               ),
             );
@@ -111,40 +110,6 @@ class _MapaScreenState extends State<MapaScreen> {
     }
   }
 
-  // Função para exibir um pop-up com as músicas recomendadas
-  void _mostrarMusicasPopUp(
-      BuildContext context, String cidade, List<String> musicas) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Músicas em $cidade'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: musicas.map((musica) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(musica),
-                );
-              }).toList(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Fechar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Função para capitalizar as primeiras letras de uma string
   String _capitalize(String text) {
     if (text.isEmpty) return text;
     return text.split(' ').map((word) {
@@ -153,7 +118,6 @@ class _MapaScreenState extends State<MapaScreen> {
     }).join(' ');
   }
 
-  // Função para obter coordenadas usando a API de geocodificação
   Future<LatLng> _getCoordinates(String cidade, String estado) async {
     if (cidade.isEmpty || estado.isEmpty) {
       throw Exception('Cidade ou estado não podem ser vazios');
@@ -167,7 +131,7 @@ class _MapaScreenState extends State<MapaScreen> {
       final response = await geocoding.searchByComponents([
         Component('locality', cidade),
         Component('administrative_area', estado),
-      ]).timeout(const Duration(seconds: 10)); // Timeout de 10 segundos
+      ]).timeout(const Duration(seconds: 10));
 
       if (response.isOkay && response.results.isNotEmpty) {
         final location = response.results.first.geometry.location;
@@ -186,42 +150,180 @@ class _MapaScreenState extends State<MapaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Tendências locais'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              // Navegar para a tela do usuário
-            },
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 15,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Tendências locais',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.person, color: Colors.white, size: 50),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFFF14621),
+                            width: 4,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: _userLocation == null
+                            ? const Center(child: CircularProgressIndicator())
+                            : _markers.isEmpty
+                                ? const Center(
+                                    child: Text(
+                                      'Nenhuma localização disponível',
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.grey),
+                                    ),
+                                  )
+                                : GoogleMap(
+                                    onMapCreated: (controller) {
+                                      setState(() {
+                                        mapController = controller;
+                                      });
+                                    },
+                                    initialCameraPosition: CameraPosition(
+                                      target: _userLocation!,
+                                      zoom: 10,
+                                    ),
+                                    markers: _markers,
+                                  ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_showMusicBox)
+                  Positioned(
+                    bottom: 100,
+                    left: 80,
+                    right: 80,
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFF14621),
+                            width: 2,
+                          ),
+                        ),
+                        constraints: const BoxConstraints(
+                          maxHeight: 150,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start, // Alinha no topo para evitar desalinhamento
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Músicas recomendadas em $_cidadeSelecionada',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFF14621),
+                                    ),
+                                    softWrap: true, // Permite quebra de linha
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      _showMusicBox = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: ListView(
+                                shrinkWrap: true,
+                                children: _musicasDaCidade.take(3).map((musica) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Text(
+                                      musica,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
-      body: _userLocation == null
-          ? const Center(child: CircularProgressIndicator())
-          : _markers.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Nenhuma localização disponível',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                )
-              : GoogleMap(
-                  onMapCreated: (controller) {
-                    setState(() {
-                      mapController = controller;
-                    });
-                  },
-                  initialCameraPosition: CameraPosition(
-                    target: _userLocation!,
-                    zoom: 10,
-                  ),
-                  markers: _markers,
-                ),
     );
   }
 }
