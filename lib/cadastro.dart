@@ -328,7 +328,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           const SizedBox(height: 15),
                           // CEP (primeiro campo de endereço)
                           _buildTextField('CEP', _cepController, _validateCEP,
-                              onChanged: (value) {
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(8),
+                                _CEPInputFormatter(), // Formatador personalizado
+                              ], onChanged: (value) {
                             if (value != null && value.length == 9) {
                               _fetchAddressFromCEP(value.replaceAll('-', ''));
                             }
@@ -491,6 +495,32 @@ class _CadastroScreenState extends State<CadastroScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// Formatador personalizado para o CEP
+class _CEPInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.length > 8) {
+      return oldValue;
+    }
+
+    final text = newValue.text.replaceAll('-', '');
+    String newText = '';
+
+    for (var i = 0; i < text.length; i++) {
+      if (i == 5) {
+        newText += '-';
+      }
+      newText += text[i];
+    }
+
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }
