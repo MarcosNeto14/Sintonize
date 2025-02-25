@@ -195,11 +195,15 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                     ),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.music_note,
-                        color: Colors.white,
-                        size: 50,
+                      IconButton(
+                        icon: const Icon(
+                          Icons.music_note,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                        onPressed: () {},
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -234,7 +238,7 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                             }
 
                             return Text(
-                              '${snapshot.data?.toUpperCase()}, ESSA MÚSICA É A SUA CARA, QUE TAL SINTONIZAR?',
+                              '${_formatName(snapshot.data!)}, essa é a nossa recomendação de música para você!',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Colors.white,
@@ -246,15 +250,14 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                           },
                         ),
                       ),
+                      const SizedBox(width: 10),
                       IconButton(
-                        icon: const Icon(Icons.map, color: Colors.white),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MapaScreen()),
-                          );
-                        },
+                        icon: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -264,8 +267,8 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
             const SizedBox(height: 20),
             Image.asset(
               'assets/logo-sintoniza.png',
-              width: 180,
-              height: 180,
+              width: 120,
+              height: 120,
             ),
             const SizedBox(height: 20),
             if (_currentMusic != null)
@@ -354,6 +357,10 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
               label: 'Sintonizados',
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.map), // Botão do mapa na barra inferior
+              label: 'Mapa',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Minha Conta',
             ),
@@ -376,6 +383,12 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
                     builder: (context) => const PesquisaDiretaScreen()),
               );
             } else if (index == 2) {
+              // Navega para a tela do mapa
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MapaScreen()),
+              );
+            } else if (index == 3) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const UsuarioScreen()),

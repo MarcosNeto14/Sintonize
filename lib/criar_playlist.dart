@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CriarPlaylistScreen extends StatefulWidget {
-  const CriarPlaylistScreen({super.key, required Map<String, dynamic> editPlaylist});
+  const CriarPlaylistScreen(
+      {super.key, required Map<String, dynamic> editPlaylist});
 
   @override
   _CriarPlaylistScreenState createState() => _CriarPlaylistScreenState();
@@ -50,7 +51,10 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
 
   String _formatName(String name) {
     if (name.isEmpty) return name;
-    return name.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+    return name
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 
   @override
@@ -59,7 +63,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com estilo da tela de usuário
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -89,7 +92,7 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                       icon: const Icon(Icons.arrow_back,
                           color: Colors.white, size: 30),
                       onPressed: () {
-                        Navigator.pop(context); // Volta para a tela anterior
+                        Navigator.pop(context);
                       },
                     ),
                     Expanded(
@@ -111,7 +114,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Campo de nome da playlist
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
@@ -130,7 +132,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Campo de pesquisa de músicas
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
@@ -145,7 +146,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Lista de músicas
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -156,7 +156,8 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                       itemBuilder: (context, index) {
                         var musica = _musicasFiltradas[index];
                         String musicaNome = _formatName(musica['track_name']);
-                        String artistName = _formatName(musica['artist_name'] ?? 'Desconhecido');
+                        String artistName = _formatName(
+                            musica['artist_name'] ?? 'Desconhecido');
 
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 5),
@@ -168,17 +169,21 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
                             title: Text('$musicaNome - $artistName'),
                             trailing: IconButton(
                               icon: Icon(
-                                _musicasSelecionadas.contains(musica['track_name'])
+                                _musicasSelecionadas
+                                        .contains(musica['track_name'])
                                     ? Icons.check_box
                                     : Icons.check_box_outline_blank,
                                 color: const Color(0xFFF14621),
                               ),
                               onPressed: () {
                                 setState(() {
-                                  if (_musicasSelecionadas.contains(musica['track_name'])) {
-                                    _musicasSelecionadas.remove(musica['track_name']);
+                                  if (_musicasSelecionadas
+                                      .contains(musica['track_name'])) {
+                                    _musicasSelecionadas
+                                        .remove(musica['track_name']);
                                   } else {
-                                    _musicasSelecionadas.add(musica['track_name']);
+                                    _musicasSelecionadas
+                                        .add(musica['track_name']);
                                   }
                                 });
                               },
@@ -190,7 +195,6 @@ class _CriarPlaylistScreenState extends State<CriarPlaylistScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Botão de salvar playlist
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ElevatedButton(

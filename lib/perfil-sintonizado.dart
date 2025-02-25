@@ -21,12 +21,14 @@ class PerfilSintonizadoScreen extends StatefulWidget {
 class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
   String _musica = 'Carregando...';
   String _artista = 'Carregando...';
+  List<String> _generosFavoritos = [];
   final User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
     _fetchMusicaRecomendada();
+    _fetchGenerosFavoritos();
   }
 
   String _formatName(String name) {
@@ -53,7 +55,8 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
           final ultimaMusica = historicoMusicas[ultimaMusicaKey];
           setState(() {
             _musica = _formatName(ultimaMusica['track_name'] ?? 'Sem título');
-            _artista = _formatName(ultimaMusica['artist_name'] ?? 'Desconhecido');
+            _artista =
+                _formatName(ultimaMusica['artist_name'] ?? 'Desconhecido');
           });
         } else {
           setState(() {
@@ -68,6 +71,29 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
         _musica = 'Erro ao carregar música';
         _artista = '';
       });
+    }
+  }
+
+  Future<void> _fetchGenerosFavoritos() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.userId)
+          .get();
+
+      if (userDoc.exists) {
+        final generosFavoritosRaw =
+            userDoc.data()?['generos_favoritos'] as List<dynamic>?;
+        if (generosFavoritosRaw != null) {
+          final generosFavoritos =
+              generosFavoritosRaw.map((g) => g.toString()).toList();
+          setState(() {
+            _generosFavoritos = generosFavoritos;
+          });
+        }
+      }
+    } catch (e) {
+      print("Erro ao carregar gêneros favoritos: $e");
     }
   }
 
@@ -116,7 +142,7 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'Sintonizado',
+                        'Perfil de ${widget.nome}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -126,73 +152,52 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.person, color: Colors.white, size: 50),
+                    const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 40, //
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF9E80),
+                      Color(0xFFF14621),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
-                    Image.asset(
-                      'assets/logo-sintoniza.png',
-                      height: 100,
-                      width: 100,
-                    ),
-                    const SizedBox(height: 20),
                     Text(
-                      'Perfil de ${widget.nome}',
+                      '🎵 $_musica',
                       style: const TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFF14621),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFFF9E80),
-                              Color(0xFFF14621),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              '🎵 $_musica',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Artista: $_artista',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Artista: $_artista',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -200,6 +205,60 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
               ),
             ),
           ),
+          if (_generosFavoritos.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFF9E80),
+                        Color(0xFFF14621),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, 
+                    children: [
+                      const Text(
+                        'Gêneros Favoritos',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        alignment: WrapAlignment.center, 
+                        spacing: 8,
+                        children: _generosFavoritos.map((genero) {
+                          return Chip(
+                            label: Text(
+                              genero,
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: const Color(0xFFF14621),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

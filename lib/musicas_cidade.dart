@@ -16,7 +16,6 @@ class MusicasCidadeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com o nome da cidade e botão de voltar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -66,7 +65,6 @@ class MusicasCidadeScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Lista de músicas
           Expanded(
             child: musicas.isEmpty
                 ? const Center(
@@ -96,7 +94,7 @@ class MusicasCidadeScreen extends StatelessWidget {
                             size: 30,
                           ),
                           title: Text(
-                            musica.split(' - ')[0], // Nome da música
+                            musica.split(' - ')[0], 
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -104,7 +102,7 @@ class MusicasCidadeScreen extends StatelessWidget {
                             ),
                           ),
                           subtitle: Text(
-                            musica.split(' - ')[1], // Nome do artista
+                            musica.split(' - ')[1],
                             style: const TextStyle(
                               color: Colors.black54,
                               fontSize: 14,

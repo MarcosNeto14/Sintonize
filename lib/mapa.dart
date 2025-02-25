@@ -93,7 +93,6 @@ class _MapaScreenState extends State<MapaScreen> {
                 markerId: MarkerId(cidade),
                 position: location,
                 onTap: () {
-                  // Navega para a nova tela ao tocar no marcador
                   Navigator.push(
                     context,
                     MaterialPageRoute(
