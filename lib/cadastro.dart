@@ -59,7 +59,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     "TO"
   ];
 
-  // Função para buscar o endereço a partir do CEP
   Future<void> _fetchAddressFromCEP(String cep) async {
     final url = Uri.parse('https://viacep.com.br/ws/$cep/json/');
     try {
@@ -90,7 +89,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     }
   }
 
-  // Validação de data de nascimento
   String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
       return 'A data de nascimento é obrigatória';
@@ -119,7 +117,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-  // Validação de e-mail
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'O e-mail é obrigatório';
@@ -132,7 +129,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-  // Validação de CEP
   String? _validateCEP(String? value) {
     if (value == null || value.isEmpty) {
       return 'O CEP é obrigatório';
@@ -143,7 +139,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-  // Validação de número
   String? _validateNumero(String? value) {
     if (value == null || value.isEmpty) {
       return 'O número é obrigatório';
@@ -154,7 +149,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return null;
   }
 
-  // Submissão do formulário
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -241,7 +235,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       ),
                       child: Column(
                         children: [
-                          // Nome e Data de Nascimento lado a lado
                           Row(
                             children: [
                               Expanded(
@@ -293,11 +286,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          // E-mail (largura total)
                           _buildTextField(
                               'E-mail', _emailController, _validateEmail),
                           const SizedBox(height: 15),
-                          // Senha e Confirmar Senha lado a lado
                           Row(
                             children: [
                               Expanded(
@@ -326,19 +317,17 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          // CEP (primeiro campo de endereço)
                           _buildTextField('CEP', _cepController, _validateCEP,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(8),
-                                _CEPInputFormatter(), // Formatador personalizado
+                                _CEPInputFormatter(),
                               ], onChanged: (value) {
                             if (value.length == 9) {
                               _fetchAddressFromCEP(value.replaceAll('-', ''));
                             }
                           }),
                           const SizedBox(height: 15),
-                          // Rua e Número lado a lado
                           Row(
                             children: [
                               Expanded(
@@ -353,7 +342,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          // Bairro e Cidade lado a lado
                           Row(
                             children: [
                               Expanded(
@@ -368,10 +356,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          // Estado
                           _buildEstadoDropdown(),
                           const SizedBox(height: 20),
-                          // Botão de Cadastrar
                           SizedBox(
                             width: double.infinity,
                             height: 50,
@@ -393,7 +379,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          // Link para Login
                           TextButton(
                             onPressed: () {
                               Navigator.push(
@@ -499,7 +484,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
   }
 }
 
-// Formatador personalizado para o CEP
 class _CEPInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

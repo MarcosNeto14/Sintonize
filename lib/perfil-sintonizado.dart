@@ -29,7 +29,6 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
     _fetchMusicaRecomendada();
   }
 
-  // Função para formatar nomes com iniciais maiúsculas
   String _formatName(String name) {
     if (name.isEmpty) return name;
     return name.split(' ').map((word) {
@@ -78,7 +77,6 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com estilo da tela de usuário
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -134,7 +132,6 @@ class _PerfilSintonizadoScreenState extends State<PerfilSintonizadoScreen> {
               ),
             ),
           ),
-          // Corpo da tela
           Expanded(
             child: SingleChildScrollView(
               child: Padding(

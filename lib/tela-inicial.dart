@@ -16,7 +16,7 @@ class TelaInicialScreen extends StatefulWidget {
 
 class _TelaInicialScreenState extends State<TelaInicialScreen> {
   int _selectedIndex = 0;
-  Map<String, String>? _currentMusic; // Armazena a música atual
+  Map<String, String>? _currentMusic;
 
   Future<String> fetchUserName() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -118,10 +118,9 @@ class _TelaInicialScreenState extends State<TelaInicialScreen> {
       final String todayKey = "${now.year}-${now.month}-${now.day}";
       historicoMusicasRaw[todayKey] = musicData;
 
-      // Atualize o Firestore com a música recomendada
       await userRef.update({
         'historico_musicas': historicoMusicasRaw,
-        'musica_recomendada': musicData, // Adicione esta linha
+        'musica_recomendada': musicData,
       });
 
       return musicData;

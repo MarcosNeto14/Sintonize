@@ -24,7 +24,6 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
     _carregarDadosUsuario();
   }
 
-  // Carrega os dados do usuário ao iniciar a tela
   Future<void> _carregarDadosUsuario() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -72,14 +71,12 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
     }
 
     try {
-      // Reautenticar o usuário para verificar a senha atual
       final credential = EmailAuthProvider.credential(
         email: user.email!,
         password: _senhaAtualController.text,
       );
       await user.reauthenticateWithCredential(credential);
 
-      // Atualizar os dados do Firebase
       final updates = <String, dynamic>{};
       if (_nomeController.text.isNotEmpty) {
         updates['nome'] = _nomeController.text;
@@ -102,7 +99,7 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dados atualizados com sucesso!')),
       );
-      Navigator.pop(context, true); // Retorna true para indicar que houve alteração
+      Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
       String message;
       switch (e.code) {
@@ -144,7 +141,6 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com estilo da tela de pesquisa direta
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -174,7 +170,7 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
                       icon: const Icon(Icons.arrow_back,
                           color: Colors.white, size: 30),
                       onPressed: () {
-                        Navigator.pop(context); // Volta para a tela anterior
+                        Navigator.pop(context);
                       },
                     ),
                     Expanded(
@@ -195,7 +191,6 @@ class _AlterarDadosScreenState extends State<AlterarDadosScreen> {
               ),
             ),
           ),
-          // Formulário de alteração de dados
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -276,7 +276,7 @@ class _MapaScreenState extends State<MapaScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start, // Alinha no topo para evitar desalinhamento
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: Text(
@@ -286,7 +286,7 @@ class _MapaScreenState extends State<MapaScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFFF14621),
                                     ),
-                                    softWrap: true, // Permite quebra de linha
+                                    softWrap: true,
                                   ),
                                 ),
                                 IconButton(

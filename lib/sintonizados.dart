@@ -121,7 +121,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com estilo da tela de usuário
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -177,7 +176,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
               ),
             ),
           ),
-          // Barra de pesquisa
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Container(
@@ -213,7 +211,6 @@ class _SintonizadosScreenState extends State<SintonizadosScreen> {
               ),
             ),
           ),
-          // Lista de sintonizados
           Expanded(
             child: SingleChildScrollView(
               child: Column(

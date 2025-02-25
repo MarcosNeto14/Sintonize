@@ -23,8 +23,8 @@ class RecupSenhaScreen extends StatelessWidget {
                   const SizedBox(height: 50),
                   Image.asset(
                     'assets/logo-sintoniza.png',
-                    width: 150, // Tamanho ajustado
-                    height: 150, // Tamanho ajustado
+                    width: 150,
+                    height: 150,
                   ),
                   const SizedBox(height: 30),
                   Card(

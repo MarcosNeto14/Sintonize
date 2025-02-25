@@ -14,7 +14,6 @@ class ArtistaScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFE1E1C1),
       body: Column(
         children: [
-          // Barra superior preta com logo e botão "Home"
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -122,7 +121,6 @@ class ArtistaScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_forward, color: Colors.white),
           color: const Color(0xFFF14621),
           onPressed: () {
-            // Ação ao clicar na música
           },
         ),
         tileColor: const Color(0xFFF14621),

@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fundo branco para seguir o padrão
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -61,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
               duration: const Duration(seconds: 2),
               child: Image.asset(
                 'assets/logo-sintoniza.png',
-                width: 150, // Tamanho ajustado para ser consistente
-                height: 150, // Tamanho ajustado para ser consistente
+                width: 150,
+                height: 150,
               ),
             ),
             const SizedBox(height: 30),
@@ -71,14 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFF14621), // Cor laranja para o texto
-                fontFamily: 'Piazzolla', // Fonte consistente
+                color: Color(0xFFF14621),
+                fontFamily: 'Piazzolla',
               ),
             ),
             const SizedBox(height: 50),
-            // Botão de Login
             SizedBox(
-              width: 250, // Largura ajustada
+              width: 250,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
@@ -106,15 +105,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white, // Fundo branco
-                  foregroundColor: const Color(0xFFF14621), // Texto e ícone laranja
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFFF14621),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15), // Bordas arredondadas
+                    borderRadius: BorderRadius.circular(15),
                     side: const BorderSide(
-                      color: Color(0xFFF14621), // Borda laranja
+                      color: Color(0xFFF14621),
                     ),
                   ),
-                  elevation: 5, // Sombra leve
+                  elevation: 5,
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -133,9 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Botão de Cadastro
             SizedBox(
-              width: 250, // Largura ajustada
+              width: 250,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {

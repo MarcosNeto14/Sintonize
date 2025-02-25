@@ -38,7 +38,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
   });
 }
 
-  // Função para formatar nomes com iniciais maiúsculas
   String _formatName(String name) {
     if (name.isEmpty) return name;
     return name.split(' ').map((word) {
@@ -49,7 +48,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
     }).join(' ');
   }
 
-  // Função para filtrar as músicas conforme o usuário digita
   void _filterMusicList(String query) {
     setState(() {
       _filteredMusicList = _allMusicList.where((musicItem) {
@@ -67,7 +65,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Cabeçalho com estilo da tela de usuário
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Card(
@@ -123,7 +120,6 @@ class _PesquisaDiretaScreenState extends State<PesquisaDiretaScreen> {
               ),
             ),
           ),
-          // Barra de pesquisa
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Container(

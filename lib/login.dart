@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import necessário
+import 'package:firebase_auth/firebase_auth.dart';
 import 'cadastro.dart';
 import 'recup-senha.dart';
 import 'tela-inicial.dart';
@@ -22,11 +22,9 @@ class LoginScreen extends StatelessWidget {
       final senha = senhaController.text.trim();
 
       try {
-        // Tentativa de login no Firebase
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: senha);
 
-        // Navegar para a tela inicial após o login bem-sucedido
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const TelaInicialScreen()),
@@ -34,7 +32,6 @@ class LoginScreen extends StatelessWidget {
       } on FirebaseAuthException catch (e) {
         String errorMessage;
 
-        // Tratamento de erros específicos
         if (e.code == 'user-not-found') {
           errorMessage = 'Usuário não encontrado. Verifique o e-mail e tente novamente.';
         } else if (e.code == 'wrong-password') {
@@ -45,7 +42,6 @@ class LoginScreen extends StatelessWidget {
           errorMessage = 'Erro inesperado ao fazer login. Por favor, tente novamente mais tarde.';
         }
 
-        // Exibição da mensagem de erro
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMessage),

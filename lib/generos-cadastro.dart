@@ -125,9 +125,8 @@ class _GenerosCadastroScreenState extends State<GenerosCadastroScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Substitua o Expanded por um Container com altura fixa
               Container(
-                height: MediaQuery.of(context).size.height * 0.5, // Ajuste a altura conforme necessário
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: ListView.builder(
                   itemCount: generos.length,
                   itemBuilder: (context, index) {

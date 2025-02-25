@@ -31,7 +31,6 @@ class _DetalhesPlaylistScreenState extends State<DetalhesPlaylistScreen> {
 
   void _filterMusicas() {
     setState(() {
-      // Filtra as músicas com base no texto da pesquisa
       _musicas = widget.musicas.where((musica) {
         return musica.toLowerCase().contains(_searchController.text.toLowerCase());
       }).toList();
