@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_webservice/geocoding.dart';
+import 'musicas_cidade.dart';
 
 class MapaScreen extends StatefulWidget {
   const MapaScreen({super.key});
@@ -92,11 +93,16 @@ class _MapaScreenState extends State<MapaScreen> {
                 markerId: MarkerId(cidade),
                 position: location,
                 onTap: () {
-                  setState(() {
-                    _showMusicBox = true;
-                    _musicasDaCidade = musicasPorCidade[cidade]!;
-                    _cidadeSelecionada = cidade;
-                  });
+                  // Navega para a nova tela ao tocar no marcador
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MusicasCidadeScreen(
+                        cidade: cidade,
+                        musicas: musicasPorCidade[cidade]!,
+                      ),
+                    ),
+                  );
                 },
               ),
             );
@@ -207,7 +213,8 @@ class _MapaScreenState extends State<MapaScreen> {
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Card(
                     elevation: 8,
                     shape: RoundedRectangleBorder(
@@ -249,76 +256,6 @@ class _MapaScreenState extends State<MapaScreen> {
                     ),
                   ),
                 ),
-                if (_showMusicBox)
-                  Positioned(
-                    bottom: 100,
-                    left: 80,
-                    right: 80,
-                    child: Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFF14621),
-                            width: 2,
-                          ),
-                        ),
-                        constraints: const BoxConstraints(
-                          maxHeight: 200,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Músicas recomendadas em $_cidadeSelecionada',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFF14621),
-                                    ),
-                                    softWrap: true,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  onPressed: () {
-                                    setState(() {
-                                      _showMusicBox = false;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Expanded(
-                              child: ListView(
-                                shrinkWrap: true,
-                                children: _musicasDaCidade.take(3).map((musica) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4),
-                                    child: Text(
-                                      musica,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
