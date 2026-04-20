@@ -1,0 +1,16 @@
+{
+  "name": "sintonize-scripts",
+  "private": true,
+  "description": "Atalhos npm para comandos Flutter do projeto Sintonize",
+  "scripts": {
+    "get": "flutter pub get",
+    "clean": "flutter clean && flutter pub get",
+    "doctor": "flutter doctor -v",
+    "analyze": "flutter analyze",
+    "test": "flutter test",
+    "run": "flutter run",
+    "web": "flutter run -d chrome",
+    "build:apk": "flutter build apk --release",
+    "build:web": "flutter build web --release"
+  }
+}
